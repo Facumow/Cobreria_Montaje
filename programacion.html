@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro COP - Buques Mercantes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a3a5f;
+            --secondary-color: #2c5f8a;
+            --accent-color: #4a9bd8;
+            --light-color: #e8f4ff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f0ff 0%, #f5f9ff 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-bottom: 50px;
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px 0;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+        }
+        
+        .app-title {
+            font-weight: 700;
+            font-size: 2.2rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .app-subtitle {
+            font-weight: 300;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            border: none;
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+            color: white;
+            font-weight: 600;
+            padding: 15px 20px;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        
+        .form-control, .btn, .form-select {
+            border-radius: 8px !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(26, 58, 95, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(to right, var(--success-color), #1e7e34);
+            border: none;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger-color), #bd2130);
+            border: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #6c757d, #5a6268);
+            border: none;
+        }
+        
+        .btn-info {
+            background: linear-gradient(to right, var(--info-color), #138496);
+            border: none;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(to right, var(--warning-color), #e0a800);
+            border: none;
+        }
+        
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            vertical-align: middle;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .table thead th:hover {
+            background-color: #0d2a47;
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(74, 155, 216, 0.05);
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(74, 155, 216, 0.15);
+        }
+        
+        .action-buttons .btn {
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .action-buttons .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 0.9rem;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .stat-card.blue {
+            background: linear-gradient(135deg, #4a9bd8, #2c5f8a);
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+        
+        .stat-card.orange {
+            background: linear-gradient(135deg, #fd7e14, #e36209);
+        }
+        
+        .stat-card.purple {
+            background: linear-gradient(135deg, #6f42c1, #563d7c);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .taller-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .taller-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+        
+        .taller-card h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .related-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--accent-color);
+            transition: all 0.3s ease;
+        }
+        
+        .related-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .related-card h5 {
+            color: var(--primary-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .related-card ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        
+        .related-card ul li {
+            margin-bottom: 8px;
+        }
+        
+        .badge-custom {
+            background: var(--accent-color);
+            color: white;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        
+        .description-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .description-cell:hover {
+            white-space: normal;
+            overflow: visible;
+            z-index: 100;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .taller-badge {
+            display: inline-block;
+            background: var(--secondary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .obra-badge {
+            background: #5a6268;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .obra-badge:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+        }
+        
+        .search-highlight {
+            background-color: #ffeb3b;
+            font-weight: bold;
+        }
+        
+        .print-header {
+            display: none;
+        }
+        
+        .sort-indicator {
+            margin-left: 5px;
+            font-size: 0.8em;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1050;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, var(--success-color), #1e7e34);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, var(--danger-color), #bd2130);
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, var(--info-color), #138496);
+        }
+        
+        .tarjeta-badge {
+            display: inline-block;
+            background: #6f42c1;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin: 2px;
+        }
+        
+        .tipo-ingreso-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge-papel {
+            background: #4a9bd8;
+            color: white;
+        }
+        
+        .badge-digital {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-ambas {
+            background: #6f42c1;
+            color: white;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .print-section, .print-section * {
+                visibility: visible;
+            }
+            
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            
+            .print-header {
+                display: block;
+                text-align: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 10px;
+            }
+            
+            .print-header h2 {
+                margin-bottom: 5px;
+            }
+            
+            .print-footer {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 0.9rem;
+                color: #666;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notifications -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle me-2"></i>
+        <span id="notification-message">Operación realizada con éxito</span>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="app-title"><i class="fas fa-ship me-3"></i>Registro COP - Buques Mercantes</h1>
+                    <p class="app-subtitle">Sistema avanzado de registro de documentación para buques mercantes</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex justify-content-md-end gap-2">
+                        <button class="btn btn-light" onclick="showHelp()">
+                            <i class="fas fa-question-circle me-2"></i>Ayuda
+                        </button>
+                        <button class="btn btn-light" onclick="showAbout()">
+                            <i class="fas fa-info-circle me-2"></i>Acerca de
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card blue">
+                    <i class="fas fa-file-alt"></i>
+                    <div class="number" id="total-docs">0</div>
+                    <div class="label">Documentos Registrados</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card green">
+                    <i class="fas fa-copy"></i>
+                    <div class="number" id="total-copias">0</div>
+                    <div class="label">Copias Totales</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card orange">
+                    <i class="fas fa-print"></i>
+                    <div class="number" id="copias-papel">0</div>
+                    <div class="label">Copias Papel</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card purple">
+                    <i class="fas fa-file-download"></i>
+                    <div class="number" id="copias-digital">0</div>
+                    <div class="label">Copias Digital</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulario de Registro -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-file-import me-2"></i>
+                    <span id="form-title">Registro de Documentación</span>
+                </div>
+                <button class="btn btn-sm btn-outline-light" id="cancel-edit-btn" style="display:none;" onclick="cancelEdit()">
+                    <i class="fas fa-times me-1"></i>Cancelar Edición
+                </button>
+            </div>
+            <div class="card-body">
+                <form id="form-registro" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="obra" class="form-label">Número de Obra*</label>
+                        <input type="text" class="form-control" id="obra" placeholder="Ej: 202301" required>
+                        <small class="form-text text-muted">Código numérico de la obra</small>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="codigo" class="form-label">Número de Plano*</label>
+                        <input type="text" class="form-control" placeholder="COP-2023-001" id="codigo" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="titulo" class="form-label">Título del documento*</label>
+                        <input type="text" class="form-control" placeholder="Planos de estructura" id="titulo" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="revision" class="form-label">Revisión*</label>
+                        <input type="number" class="form-control" placeholder="3" id="revision" min="0" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="fecha" class="form-label">Fecha*</label>
+                        <input type="date" class="form-control" id="fecha" required>
+                    </div>
+                    
+                    <!-- Campo para Tipo de Ingreso -->
+                    <div class="col-md-3">
+                        <label for="tipo-ingreso" class="form-label">Tipo de Ingreso*</label>
+                        <select class="form-select" id="tipo-ingreso" required>
+                            <option value="" disabled selected>Seleccionar...</option>
+                            <option value="Copia Papel">Copia Papel</option>
+                            <option value="Digital">Digital</option>
+                            <option value="Ambas">Ambas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label for="planos" class="form-label">Planos Relacionados</label>
+                        <input type="text" class="form-control" placeholder="COP-2023-002, COP-2023-005" id="planos">
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label for="tarjetas-trabajo" class="form-label">Tarjetas de Trabajo Asociadas</label>
+                        <input type="text" class="form-control" placeholder="T-001, T-002" id="tarjetas-trabajo">
+                        <small class="form-text text-muted">Ingrese códigos separados por comas</small>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" placeholder="Detalles técnicos del documento..." rows="2"></textarea>
+                    </div>
+                    
+                    <div class="col-md-12 mt-3">
+                        <h5><i class="fas fa-copy me-2"></i>Cantidad de Copias por Taller</h5>
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label for="taller-a" class="form-label">Cobrería (Cob)</label>
+                                <input type="number" class="form-control" id="taller-a" min="0" value="0">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="taller-b" class="form-label">Trat. Superf. (TS)</label>
+                                <input type="number" class="form-control" id="taller-b" min="0" value="0">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="taller-c" class="form-label">Electromec. (Elec)</label>
+                                <input type="number" class="form-control" id="taller-c" min="0" value="0">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="taller-d" class="form-label">Carpintería (Carp)</label>
+                                <input type="number" class="form-control" id="taller-d" min="0" value="0">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="taller-e" class="form-label">Chapa Fina (CF)</label>
+                                <input type="number" class="form-control" id="taller-e" min="0" value="0">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="taller-f" class="form-label">Mat. Comp. (MC)</label>
+                                <input type="number" class="form-control" id="taller-f" min="0" value="0">
+                            </div>
+                            <!-- Nuevo taller COP -->
+                            <div class="col-md-2">
+                                <label for="taller-g" class="form-label">COP</label>
+                                <input type="number" class="form-control" id="taller-g" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12 mt-3">
+                        <button type="submit" class="btn btn-primary w-100 py-2" id="submit-btn">
+                            <i class="fas fa-plus-circle me-2"></i>Agregar Documento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tarjetas Relacionadas -->
+        <div class="row mb-4 related-cards-section">
+            <div class="col-md-4">
+                <div class="related-card">
+                    <h5><i class="fas fa-star me-2 text-warning"></i>Documentos Recientes</h5>
+                    <ul id="recent-docs">
+                        <li>No hay documentos recientes</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="related-card">
+                    <h5><i class="fas fa-chart-pie me-2 text-info"></i>Distribución de Copias</h5>
+                    <canvas id="copias-chart" height="200"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="related-card">
+                    <h5><i class="fas fa-tools me-2 text-success"></i>Talleres con Más Copias</h5>
+                    <ul id="top-talleres">
+                        <li>No hay datos disponibles</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección de Filtros -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5><i class="fas fa-filter me-2"></i>Filtros</h5>
+                    <div class="d-flex gap-3">
+                        <div class="flex-grow-1">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" placeholder="Buscar por obra, número de plano o título..." id="search-input">
+                            </div>
+                        </div>
+                        <div class="w-25">
+                            <input type="text" class="form-control" placeholder="Filtrar por obra..." id="obra-filter">
+                        </div>
+                        <button class="btn btn-outline-secondary" onclick="limpiarFiltros()">
+                            <i class="fas fa-times"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5><i class="fas fa-list me-2"></i>Obras Recientes</h5>
+                    <div class="d-flex flex-wrap gap-2" id="obras-list">
+                        <span class="text-muted">No hay obras registradas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección de Talleres -->
+        <div class="row mb-4 talleres-section">
+            <div class="col-md-12">
+                <h4 class="mb-3"><i class="fas fa-warehouse me-2"></i>Resumen por Taller</h4>
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="taller-card">
+                            <h5>Cobrería <span class="taller-badge">Cob</span></h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Copias:</span>
+                                <span class="badge-custom" id="taller-a-total">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="taller-card">
+                            <h5>Trat. Superf. <span class="taller-badge">TS</span></h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Copias:</span>
+                                <span class="badge-custom" id="taller-b-total">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="taller-card">
+                            <h5>Electromec. <span class="taller-badge">Elec</span></h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Copias:</span>
+                                <span class="badge-custom" id="taller-c-total">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="taller-card">
+                            <h5>Carpintería <span class="taller-badge">Carp</span></h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Copias:</span>
+                                <span class="badge-custom" id="taller-d-total">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="taller-card">
+                            <h5>Chapa Fina <span class="taller-badge">CF</span></h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Copias:</span>
+                                <span class="badge-custom" id="taller-e-total">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="taller-card">
+                            <h5>Mat. Comp. <span class="taller-badge">MC</span></h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Copias:</span>
+                                <span class="badge-custom" id="taller-f-total">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Nuevo taller COP -->
+                    <div class="col-md-2">
+                        <div class="taller-card">
+                            <h5>COP</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Copias:</span>
+                                <span class="badge-custom" id="taller-g-total">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla de Registros -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-table me-2"></i>Documentos Registrados
+                    <span class="ms-2 text-muted fw-normal">(<span id="total-registros">0</span> registros)</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-light" onclick="clearTable()">
+                        <i class="fas fa-trash-alt me-1"></i>Limpiar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" id="tabla-container">
+                    <table class="table table-striped table-hover table-bordered" id="tabla">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-sort="obra">Obra <span class="sort-indicator">▼</span></th>
+                                <th data-sort="codigo">Número de Plano</th>
+                                <th data-sort="titulo">Título</th>
+                                <th data-sort="revision">Revisión</th>
+                                <th data-sort="fecha">Fecha</th>
+                                <th data-sort="tipoIngreso">Tipo Ingreso</th>
+                                <th>Descripción</th>
+                                <th>Planos Relacionados</th>
+                                <th>Tarjetas Trabajo</th>
+                                <th data-sort="totalCopias">Copias Totales</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Las filas se agregarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginación -->
+                <div class="pagination-container" id="pagination-container">
+                    <nav>
+                        <ul class="pagination" id="pagination">
+                            <li class="page-item disabled" id="prev-page">
+                                <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                            </li>
+                            <!-- Las páginas se generan dinámicamente -->
+                            <li class="page-item" id="next-page">
+                                <a class="page-link" href="#">Siguiente</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <!-- Estado vacío -->
+                <div class="empty-state" id="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No hay documentos registrados</h3>
+                    <p class="mb-0">Comienza agregando documentos utilizando el formulario superior</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botones de Acción -->
+        <div class="action-buttons mt-4 d-flex gap-2">
+            <button class="btn btn-success flex-grow-1" onclick="exportarExcel()">
+                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+            </button>
+            <button class="btn btn-danger flex-grow-1" onclick="guardarPDF()">
+                <i class="fas fa-file-pdf me-2"></i>Guardar como PDF
+            </button>
+            <button class="btn btn-info flex-grow-1" onclick="imprimirTabla()">
+                <i class="fas fa-print me-2"></i>Imprimir
+            </button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    Sistema de Registro COP - Buques Mercantes &copy; 2023 | Todos los derechos reservados
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Modal de Detalles -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Detalles del Documento</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Obra</h6>
+                            <p id="detail-obra" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Número de Plano</h6>
+                            <p id="detail-codigo" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Título</h6>
+                            <p id="detail-titulo" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Revisión</h6>
+                            <p id="detail-revision" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Fecha</h6>
+                            <p id="detail-fecha" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Tipo de Ingreso</h6>
+                            <p id="detail-tipo-ingreso" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Copias Totales</h6>
+                            <p id="detail-copias" class="fw-bold">-</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Descripción</h6>
+                        <p id="detail-descripcion" class="text-muted">No hay descripción disponible</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Planos Relacionados</h6>
+                        <p id="detail-planos" class="text-muted">No se especificaron planos relacionados</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Tarjetas de Trabajo Asociadas</h6>
+                        <p id="detail-tarjetas" class="text-muted">No se especificaron tarjetas de trabajo</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="mb-3">Distribución de Copias</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between">
+                                    <span>Cobrería (Cob):</span>
+                                    <span id="detail-taller-a" class="fw-bold">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between">
+                                    <span>Trat. Superf. (TS):</span>
+                                    <span id="detail-taller-b" class="fw-bold">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between">
+                                    <span>Electromec. (Elec):</span>
+                                    <span id="detail-taller-c" class="fw-bold">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between">
+                                    <span>Carpintería (Carp):</span>
+                                    <span id="detail-taller-d" class="fw-bold">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between">
+                                    <span>Chapa Fina (CF):</span>
+                                    <span id="detail-taller-e" class="fw-bold">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between">
+                                    <span>Mat. Comp. (MC):</span>
+                                    <span id="detail-taller-f" class="fw-bold">0</span>
+                                </div>
+                            </div>
+                            <!-- Nuevo taller COP -->
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between">
+                                    <span>COP:</span>
+                                    <span id="detail-taller-g" class="fw-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sección oculta para impresión -->
+    <div class="print-section" style="display: none;">
+        <div class="print-header">
+            <h2>Registro COP - Buques Mercantes</h2>
+            <p>Reporte de documentos registrados - Fecha: <span id="print-date"></span></p>
+        </div>
+        <div id="print-table-container"></div>
+        <div class="print-footer">
+            <p>Sistema de Registro COP - Generado el <span id="print-footer-date"></span></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Inicializar variables
+        let registros = [];
+        let editIndex = -1;
+        let currentPage = 1;
+        const recordsPerPage = 10;
+        let currentSort = { field: 'obra', direction: 'asc' };
+        
+        const tablaBody = document.querySelector("#table-body");
+        const form = document.getElementById("form-registro");
+        const emptyState = document.getElementById("empty-state");
+        const searchInput = document.getElementById("search-input");
+        const obraFilter = document.getElementById("obra-filter");
+        const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+        let copiasChart = null;
+        
+        // Paleta de colores fijos para cada taller (incluyendo COP)
+        const coloresTalleres = {
+            'Cobrería (Cob)': 'rgba(54, 162, 235, 0.7)',
+            'Trat. Superf. (TS)': 'rgba(75, 192, 192, 0.7)',
+            'Electromec. (Elec)': 'rgba(153, 102, 255, 0.7)',
+            'Carpintería (Carp)': 'rgba(255, 159, 64, 0.7)',
+            'Chapa Fina (CF)': 'rgba(255, 99, 132, 0.7)',
+            'Mat. Comp. (MC)': 'rgba(201, 203, 207, 0.7)',
+            'COP': 'rgba(220, 53, 69, 0.7)' // Color rojo para COP
+        };
+        
+        // Inicializar la fecha con la fecha actual
+        document.getElementById('fecha').valueAsDate = new Date();
+        
+        // Cargar registros desde localStorage al inicio
+        function cargarRegistros() {
+            const savedRegistros = localStorage.getItem('cop_registros');
+            if (savedRegistros) {
+                registros = JSON.parse(savedRegistros);
+                // Ordenar por obra y luego por número de plano
+                sortRegistros('obra');
+                actualizarTabla();
+                actualizarEstadisticas();
+                actualizarTarjetasRelacionadas();
+                actualizarResumenTalleres();
+                actualizarFiltros();
+                
+                if (registros.length > 0) {
+                    emptyState.style.display = 'none';
+                }
+            }
+        }
+        
+        // Guardar registros en localStorage
+        function guardarRegistros() {
+            localStorage.setItem('cop_registros', JSON.stringify(registros));
+        }
+        
+        // Mostrar notificación
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            const notification = document.getElementById('notification');
+            const message = document.getElementById('notification-message');
+            
+            notification.className = 'notification ' + tipo;
+            message.textContent = mensaje;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Evento submit del formulario
+        form.addEventListener("submit", e => {
+            e.preventDefault();
+            
+            const obra = document.getElementById("obra").value;
+            const codigo = document.getElementById("codigo").value;
+            const titulo = document.getElementById("titulo").value;
+            const revision = document.getElementById("revision").value;
+            const fecha = document.getElementById("fecha").value;
+            const tipoIngreso = document.getElementById("tipo-ingreso").value;
+            const descripcion = document.getElementById("descripcion").value;
+            const planos = document.getElementById("planos").value;
+            const tarjetasTrabajo = document.getElementById("tarjetas-trabajo").value;
+            
+            const copias = {
+                tallerA: parseInt(document.getElementById("taller-a").value) || 0,
+                tallerB: parseInt(document.getElementById("taller-b").value) || 0,
+                tallerC: parseInt(document.getElementById("taller-c").value) || 0,
+                tallerD: parseInt(document.getElementById("taller-d").value) || 0,
+                tallerE: parseInt(document.getElementById("taller-e").value) || 0,
+                tallerF: parseInt(document.getElementById("taller-f").value) || 0,
+                tallerG: parseInt(document.getElementById("taller-g").value) || 0 // Nuevo taller COP
+            };
+            
+            const totalCopias = Object.values(copias).reduce((a, b) => a + b, 0);
+            
+            if (editIndex === -1) {
+                // Verificar si ya existe el mismo plano en la misma obra con la misma revisión
+                const existeMismaRevision = registros.some(r => 
+                    r.obra === obra && 
+                    r.codigo === codigo && 
+                    r.revision === revision
+                );
+                
+                if (existeMismaRevision) {
+                    mostrarNotificacion('Ya existe un documento con esta obra, número de plano y revisión', 'error');
+                    return;
+                }
+                
+                const registro = { 
+                    obra,
+                    codigo, 
+                    titulo, 
+                    revision, 
+                    fecha,
+                    tipoIngreso,
+                    descripcion: descripcion || "Sin descripción",
+                    planos: planos || "No especificados",
+                    tarjetasTrabajo: tarjetasTrabajo || "No especificadas",
+                    copias,
+                    totalCopias
+                };
+                
+                registros.push(registro);
+                mostrarNotificacion('Documento agregado correctamente');
+            } else {
+                // Actualizar registro existente
+                registros[editIndex] = { 
+                    obra,
+                    codigo, 
+                    titulo, 
+                    revision, 
+                    fecha,
+                    tipoIngreso,
+                    descripcion: descripcion || "Sin descripción",
+                    planos: planos || "No especificados",
+                    tarjetasTrabajo: tarjetasTrabajo || "No especificadas",
+                    copias,
+                    totalCopias
+                };
+                
+                mostrarNotificacion('Documento actualizado correctamente');
+                cancelEdit();
+            }
+            
+            guardarRegistros();
+            // Ordenar por obra y luego por número de plano
+            sortRegistros('obra');
+            actualizarTabla();
+            actualizarEstadisticas();
+            actualizarTarjetasRelacionadas();
+            actualizarResumenTalleres();
+            actualizarFiltros();
+            form.reset();
+            document.getElementById('fecha').valueAsDate = new Date();
+            
+            // Ocultar estado vacío
+            emptyState.style.display = 'none';
+        });
+        
+        // Función para agregar fila a la tabla
+        function agregarFilaTabla(r, index) {
+            const fila = document.createElement("tr");
+            
+            // Determinar clase CSS según tipo de ingreso
+            let tipoIngresoClass = "";
+            let tipoIngresoText = r.tipoIngreso;
+            if (r.tipoIngreso === "Copia Papel") {
+                tipoIngresoClass = "badge-papel";
+            } else if (r.tipoIngreso === "Digital") {
+                tipoIngresoClass = "badge-digital";
+            } else if (r.tipoIngreso === "Ambas") {
+                tipoIngresoClass = "badge-ambas";
+            }
+            
+            // Formatear tarjetas de trabajo como badges
+            let tarjetasHTML = "No especificadas";
+            if (r.tarjetasTrabajo && r.tarjetasTrabajo !== "No especificadas") {
+                const tarjetas = r.tarjetasTrabajo.split(',').map(t => t.trim());
+                tarjetasHTML = tarjetas.map(t => `<span class="tarjeta-badge">${t}</span>`).join('');
+            }
+            
+            fila.innerHTML = `
+                <td>${r.obra}</td>
+                <td>${r.codigo}</td>
+                <td>${r.titulo}</td>
+                <td>${r.revision}</td>
+                <td>${formatDate(r.fecha)}</td>
+                <td><span class="tipo-ingreso-badge ${tipoIngresoClass}">${tipoIngresoText}</span></td>
+                <td class="description-cell">${r.descripcion}</td>
+                <td>${r.planos}</td>
+                <td>${tarjetasHTML}</td>
+                <td class="text-center fw-bold">${r.totalCopias}</td>
+                <td>
+                    <button class="btn btn-sm btn-info me-1" onclick="verDetalles('${r.codigo}', '${r.obra}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning me-1" onclick="editarRegistro(${index})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="eliminarRegistro(${index})">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `;
+            tablaBody.appendChild(fila);
+        }
+        
+        // Función para formatear fecha
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+        
+        // Función para exportar a Excel
+        function exportarExcel() {
+            if (registros.length === 0) {
+                mostrarNotificacion("No hay registros para exportar", "error");
+                return;
+            }
+            
+            try {
+                const data = registros.map(r => ({
+                    'Obra': r.obra,
+                    'Número de Plano': r.codigo,
+                    'Título': r.titulo,
+                    'Revisión': r.revision,
+                    'Fecha': formatDate(r.fecha),
+                    'Tipo de Ingreso': r.tipoIngreso,
+                    'Descripción': r.descripcion,
+                    'Planos Relacionados': r.planos,
+                    'Tarjetas de Trabajo': r.tarjetasTrabajo,
+                    'Copias Totales': r.totalCopias,
+                    'Cobrería (Cob)': r.copias.tallerA,
+                    'Trat. Superf. (TS)': r.copias.tallerB,
+                    'Electromec. (Elec)': r.copias.tallerC,
+                    'Carpintería (Carp)': r.copias.tallerD,
+                    'Chapa Fina (CF)': r.copias.tallerE,
+                    'Mat. Comp. (MC)': r.copias.tallerF,
+                    'COP': r.copias.tallerG
+                }));
+                
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Registros COP");
+                XLSX.writeFile(wb, "registro_cop_buques.xlsx");
+                mostrarNotificacion('Exportación a Excel completada');
+            } catch (error) {
+                mostrarNotificacion("Error al exportar a Excel: " + error.message, "error");
+            }
+        }
+        
+        // Función para guardar como PDF (adaptada para múltiples páginas y A4)
+        function guardarPDF() {
+            if (registros.length === 0) {
+                mostrarNotificacion("No hay registros para exportar", "error");
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+                
+                // Título
+                doc.setFontSize(18);
+                doc.setFont(undefined, 'bold');
+                doc.text('Registro COP - Buques Mercantes', pageWidth / 2, margin, { align: 'center' });
+                
+                // Fecha
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'normal');
+                doc.text('Reporte generado el: ' + new Date().toLocaleDateString(), pageWidth / 2, margin + 10, { align: 'center' });
+                
+                // Preparar datos para la tabla
+                const headers = [
+                    'Obra',
+                    'Número Plano',
+                    'Título',
+                    'Revisión',
+                    'Fecha',
+                    'Tipo',
+                    'Copias Totales'
+                ];
+                
+                const data = registros.map(r => [
+                    r.obra,
+                    r.codigo,
+                    r.titulo,
+                    r.revision,
+                    formatDate(r.fecha),
+                    r.tipoIngreso,
+                    r.totalCopias
+                ]);
+                
+                // Configuración de autoTable
+                doc.autoTable({
+                    startY: margin + 15,
+                    head: [headers],
+                    body: data,
+                    margin: { top: margin + 15 },
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 2,
+                        overflow: 'linebreak'
+                    },
+                    headStyles: {
+                        fillColor: [26, 58, 95],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 240, 240]
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 20 },
+                        1: { cellWidth: 30 },
+                        2: { cellWidth: 50 },
+                        3: { cellWidth: 15 },
+                        4: { cellWidth: 20 },
+                        5: { cellWidth: 25 },
+                        6: { cellWidth: 20 }
+                    },
+                    tableWidth: 'auto',
+                    pageBreak: 'auto',
+                    theme: 'grid'
+                });
+                
+                // Pie de página
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(10);
+                    doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                }
+                
+                doc.save('registro_cop_buques.pdf');
+                mostrarNotificacion('PDF generado correctamente');
+            } catch (error) {
+                mostrarNotificacion("Error al generar PDF: " + error.message, "error");
+            }
+        }
+        
+        // Función para imprimir todos los registros (sin paginación)
+        function imprimirTabla() {
+            if (registros.length === 0) {
+                mostrarNotificacion("No hay registros para imprimir", "error");
+                return;
+            }
+            
+            // Actualizar la fecha en el encabezado
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString();
+            document.getElementById('print-footer-date').textContent = new Date().toLocaleDateString();
+            
+            // Crear tabla para impresión
+            const printContainer = document.getElementById('print-table-container');
+            printContainer.innerHTML = '';
+            
+            const table = document.createElement('table');
+            table.className = 'table table-bordered';
+            table.style.width = '100%';
+            table.style.fontSize = '10pt';
+            
+            // Crear encabezados
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Obra</th>
+                    <th>Número Plano</th>
+                    <th>Título</th>
+                    <th>Revisión</th>
+                    <th>Fecha</th>
+                    <th>Tipo Ingreso</th>
+                    <th>Copias Totales</th>
+                </tr>
+            `;
+            table.appendChild(thead);
+            
+            // Crear cuerpo de la tabla con todos los registros
+            const tbody = document.createElement('tbody');
+            registros.forEach(r => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${r.obra}</td>
+                    <td>${r.codigo}</td>
+                    <td>${r.titulo}</td>
+                    <td>${r.revision}</td>
+                    <td>${formatDate(r.fecha)}</td>
+                    <td>${r.tipoIngreso}</td>
+                    <td>${r.totalCopias}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+            
+            printContainer.appendChild(table);
+            
+            // Mostrar la sección de impresión y ocultar el resto
+            document.querySelector('.print-section').style.display = 'block';
+            
+            // Imprimir
+            window.print();
+            
+            // Ocultar la sección de impresión después de imprimir
+            setTimeout(() => {
+                document.querySelector('.print-section').style.display = 'none';
+            }, 500);
+        }
+        
+        // Función para eliminar un registro
+        function eliminarRegistro(index) {
+            if (confirm("¿Está seguro de eliminar este registro?")) {
+                registros.splice(index, 1);
+                guardarRegistros();
+                actualizarTabla();
+                actualizarEstadisticas();
+                actualizarTarjetasRelacionadas();
+                actualizarResumenTalleres();
+                actualizarFiltros();
+                mostrarNotificacion('Documento eliminado correctamente');
+                
+                if (registros.length === 0) {
+                    emptyState.style.display = 'block';
+                }
+            }
+        }
+        
+        // Función para editar un registro
+        function editarRegistro(index) {
+            const r = registros[index];
+            document.getElementById("obra").value = r.obra;
+            document.getElementById("codigo").value = r.codigo;
+            document.getElementById("titulo").value = r.titulo;
+            document.getElementById("revision").value = r.revision;
+            document.getElementById("fecha").value = r.fecha;
+            document.getElementById("tipo-ingreso").value = r.tipoIngreso;
+            document.getElementById("descripcion").value = r.descripcion;
+            document.getElementById("planos").value = r.planos;
+            document.getElementById("tarjetas-trabajo").value = r.tarjetasTrabajo;
+            document.getElementById("taller-a").value = r.copias.tallerA;
+            document.getElementById("taller-b").value = r.copias.tallerB;
+            document.getElementById("taller-c").value = r.copias.tallerC;
+            document.getElementById("taller-d").value = r.copias.tallerD;
+            document.getElementById("taller-e").value = r.copias.tallerE;
+            document.getElementById("taller-f").value = r.copias.tallerF;
+            document.getElementById("taller-g").value = r.copias.tallerG;
+            
+            // Cambiar el botón
+            document.getElementById("submit-btn").innerHTML = '<i class="fas fa-sync-alt me-2"></i>Actualizar Documento';
+            document.getElementById("form-title").textContent = "Editar Documento";
+            document.getElementById("cancel-edit-btn").style.display = 'block';
+            
+            editIndex = index;
+            
+            // Scroll al formulario
+            document.getElementById('form-registro').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Cancelar edición
+        function cancelEdit() {
+            form.reset();
+            document.getElementById('fecha').valueAsDate = new Date();
+            document.getElementById("submit-btn").innerHTML = '<i class="fas fa-plus-circle me-2"></i>Agregar Documento';
+            document.getElementById("form-title").textContent = "Registro de Documentación";
+            document.getElementById("cancel-edit-btn").style.display = 'none';
+            editIndex = -1;
+        }
+        
+        // Función para limpiar la tabla
+        function clearTable() {
+            if (registros.length === 0) return;
+            
+            if (confirm("¿Está seguro de eliminar todos los registros?")) {
+                registros = [];
+                guardarRegistros();
+                actualizarTabla();
+                actualizarEstadisticas();
+                actualizarTarjetasRelacionadas();
+                actualizarResumenTalleres();
+                actualizarFiltros();
+                emptyState.style.display = 'block';
+                mostrarNotificacion('Todos los registros han sido eliminados');
+            }
+        }
+        
+        // Función para actualizar estadísticas
+        function actualizarEstadisticas() {
+            document.getElementById('total-docs').textContent = registros.length;
+            document.getElementById('total-registros').textContent = registros.length;
+            
+            if (registros.length > 0) {
+                // Calcular copias en papel
+                const copiasPapel = registros.reduce((acc, curr) => {
+                    if (curr.tipoIngreso === 'Copia Papel' || curr.tipoIngreso === 'Ambas') {
+                        return acc + curr.totalCopias;
+                    }
+                    return acc;
+                }, 0);
+                document.getElementById('copias-papel').textContent = copiasPapel;
+                
+                // Calcular copias digitales
+                const copiasDigital = registros.reduce((acc, curr) => {
+                    if (curr.tipoIngreso === 'Digital' || curr.tipoIngreso === 'Ambas') {
+                        return acc + 1;
+                    }
+                    return acc;
+                }, 0);
+                document.getElementById('copias-digital').textContent = copiasDigital;
+                
+                // Obtener última fecha
+                const latestDate = registros.reduce((latest, curr) => 
+                    curr.fecha > latest ? curr.fecha : latest, registros[0].fecha);
+                document.getElementById('latest-date').textContent = formatDate(latestDate);
+                
+                // Total de copias físicas
+                const totalCopias = registros.reduce((acc, curr) => acc + curr.totalCopias, 0);
+                document.getElementById('total-copias').textContent = totalCopias;
+            } else {
+                document.getElementById('copias-papel').textContent = '0';
+                document.getElementById('copias-digital').textContent = '0';
+                document.getElementById('latest-date').textContent = '-';
+                document.getElementById('total-copias').textContent = '0';
+            }
+        }
+        
+        // Función para ver detalles de un registro
+        function verDetalles(codigo, obra) {
+            const registro = registros.find(r => r.codigo === codigo && r.obra === obra);
+            if (!registro) return;
+            
+            document.getElementById('detail-obra').textContent = registro.obra;
+            document.getElementById('detail-codigo').textContent = registro.codigo;
+            document.getElementById('detail-titulo').textContent = registro.titulo;
+            document.getElementById('detail-revision').textContent = registro.revision;
+            document.getElementById('detail-fecha').textContent = formatDate(registro.fecha);
+            document.getElementById('detail-tipo-ingreso').textContent = registro.tipoIngreso;
+            document.getElementById('detail-descripcion').textContent = registro.descripcion;
+            document.getElementById('detail-planos').textContent = registro.planos;
+            document.getElementById('detail-copias').textContent = registro.totalCopias;
+            
+            // Formatear tarjetas de trabajo
+            let tarjetasHTML = "No especificadas";
+            if (registro.tarjetasTrabajo && registro.tarjetasTrabajo !== "No especificadas") {
+                const tarjetas = registro.tarjetasTrabajo.split(',').map(t => t.trim());
+                tarjetasHTML = tarjetas.map(t => `<span class="tarjeta-badge">${t}</span>`).join('');
+            }
+            document.getElementById('detail-tarjetas').innerHTML = tarjetasHTML;
+            
+            document.getElementById('detail-taller-a').textContent = registro.copias.tallerA;
+            document.getElementById('detail-taller-b').textContent = registro.copias.tallerB;
+            document.getElementById('detail-taller-c').textContent = registro.copias.tallerC;
+            document.getElementById('detail-taller-d').textContent = registro.copias.tallerD;
+            document.getElementById('detail-taller-e').textContent = registro.copias.tallerE;
+            document.getElementById('detail-taller-f').textContent = registro.copias.tallerF;
+            document.getElementById('detail-taller-g').textContent = registro.copias.tallerG;
+            
+            detailModal.show();
+        }
+        
+        // Función para actualizar tarjetas relacionadas
+        function actualizarTarjetasRelacionadas() {
+            // Documentos recientes
+            const recentList = document.getElementById('recent-docs');
+            recentList.innerHTML = '';
+            
+            if (registros.length === 0) {
+                recentList.innerHTML = '<li>No hay documentos recientes</li>';
+            } else {
+                const recentDocs = [...registros].reverse().slice(0, 5);
+                recentDocs.forEach(doc => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="fw-bold">${doc.codigo}</span> (${doc.obra}) - ${doc.titulo}`;
+                    recentList.appendChild(li);
+                });
+            }
+            
+            // Talleres con más copias
+            const topTalleresList = document.getElementById('top-talleres');
+            topTalleresList.innerHTML = '';
+            
+            if (registros.length === 0) {
+                topTalleresList.innerHTML = '<li>No hay datos disponibles</li>';
+            } else {
+                const talleres = {
+                    'Cobrería (Cob)': registros.reduce((sum, doc) => sum + doc.copias.tallerA, 0),
+                    'Trat. Superf. (TS)': registros.reduce((sum, doc) => sum + doc.copias.tallerB, 0),
+                    'Electromec. (Elec)': registros.reduce((sum, doc) => sum + doc.copias.tallerC, 0),
+                    'Carpintería (Carp)': registros.reduce((sum, doc) => sum + doc.copias.tallerD, 0),
+                    'Chapa Fina (CF)': registros.reduce((sum, doc) => sum + doc.copias.tallerE, 0),
+                    'Mat. Comp. (MC)': registros.reduce((sum, doc) => sum + doc.copias.tallerF, 0),
+                    'COP': registros.reduce((sum, doc) => sum + doc.copias.tallerG, 0)
+                };
+                
+                // Ordenar talleres por cantidad de copias
+                const sortedTalleres = Object.entries(talleres)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3);
+                
+                sortedTalleres.forEach(([taller, copias]) => {
+                    if (copias > 0) {
+                        const li = document.createElement('li');
+                        li.innerHTML = `${taller}: <span class="fw-bold">${copias}</span> copias`;
+                        topTalleresList.appendChild(li);
+                    }
+                });
+                
+                if (topTalleresList.children.length === 0) {
+                    topTalleresList.innerHTML = '<li>No hay copias registradas</li>';
+                }
+            }
+            
+            // Actualizar gráfico de distribución
+            actualizarGraficoCopias();
+        }
+        
+        // Función para actualizar gráfico de copias con colores fijos
+        function actualizarGraficoCopias() {
+            const ctx = document.getElementById('copias-chart').getContext('2d');
+            
+            // Destruir gráfico existente si hay uno
+            if (copiasChart) {
+                copiasChart.destroy();
+            }
+            
+            if (registros.length === 0) {
+                return;
+            }
+            
+            const talleres = {
+                'Cobrería (Cob)': registros.reduce((sum, doc) => sum + doc.copias.tallerA, 0),
+                'Trat. Superf. (TS)': registros.reduce((sum, doc) => sum + doc.copias.tallerB, 0),
+                'Electromec. (Elec)': registros.reduce((sum, doc) => sum + doc.copias.tallerC, 0),
+                'Carpintería (Carp)': registros.reduce((sum, doc) => sum + doc.copias.tallerD, 0),
+                'Chapa Fina (CF)': registros.reduce((sum, doc) => sum + doc.copias.tallerE, 0),
+                'Mat. Comp. (MC)': registros.reduce((sum, doc) => sum + doc.copias.tallerF, 0),
+                'COP': registros.reduce((sum, doc) => sum + doc.copias.tallerG, 0)
+            };
+            
+            const labels = Object.keys(talleres);
+            const data = Object.values(talleres);
+            const total = data.reduce((a, b) => a + b, 0);
+            
+            if (total === 0) {
+                return;
+            }
+            
+            // Usar colores fijos para cada taller
+            const backgroundColors = labels.map(taller => coloresTalleres[taller]);
+            
+            copiasChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Función para actualizar resumen de talleres
+        function actualizarResumenTalleres() {
+            if (registros.length === 0) {
+                document.getElementById('taller-a-total').textContent = '0';
+                document.getElementById('taller-b-total').textContent = '0';
+                document.getElementById('taller-c-total').textContent = '0';
+                document.getElementById('taller-d-total').textContent = '0';
+                document.getElementById('taller-e-total').textContent = '0';
+                document.getElementById('taller-f-total').textContent = '0';
+                document.getElementById('taller-g-total').textContent = '0';
+                return;
+            }
+            
+            document.getElementById('taller-a-total').textContent = 
+                registros.reduce((sum, doc) => sum + doc.copias.tallerA, 0);
+                
+            document.getElementById('taller-b-total').textContent = 
+                registros.reduce((sum, doc) => sum + doc.copias.tallerB, 0);
+                
+            document.getElementById('taller-c-total').textContent = 
+                registros.reduce((sum, doc) => sum + doc.copias.tallerC, 0);
+                
+            document.getElementById('taller-d-total').textContent = 
+                registros.reduce((sum, doc) => sum + doc.copias.tallerD, 0);
+                
+            document.getElementById('taller-e-total').textContent = 
+                registros.reduce((sum, doc) => sum + doc.copias.tallerE, 0);
+                
+            document.getElementById('taller-f-total').textContent = 
+                registros.reduce((sum, doc) => sum + doc.copias.tallerF, 0);
+                
+            document.getElementById('taller-g-total').textContent = 
+                registros.reduce((sum, doc) => sum + doc.copias.tallerG, 0);
+        }
+        
+        // Función para actualizar filtros
+        function actualizarFiltros() {
+            const obrasList = document.getElementById('obras-list');
+            obrasList.innerHTML = '';
+            
+            // Obtener obras únicas
+            const obrasUnicas = [...new Set(registros.map(r => r.obra))];
+            
+            if (obrasUnicas.length === 0) {
+                obrasList.innerHTML = '<span class="text-muted">No hay obras registradas</span>';
+                return;
+            }
+            
+            obrasUnicas.forEach(obra => {
+                const badge = document.createElement('div');
+                badge.className = 'obra-badge';
+                badge.textContent = obra;
+                badge.onclick = function() {
+                    obraFilter.value = obra;
+                    filtrarRegistros();
+                };
+                obrasList.appendChild(badge);
+            });
+        }
+        
+        // Función para filtrar registros
+        function filtrarRegistros() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const obraSeleccionada = obraFilter.value;
+            
+            const rows = tablaBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const obra = row.cells[0].textContent.toLowerCase();
+                const codigo = row.cells[1].textContent.toLowerCase();
+                const titulo = row.cells[2].textContent.toLowerCase();
+                
+                let mostrar = true;
+                
+                // Filtrar por obra
+                if (obraSeleccionada && obra !== obraSeleccionada.toLowerCase()) {
+                    mostrar = false;
+                }
+                
+                // Filtrar por búsqueda
+                if (mostrar && searchTerm) {
+                    // Buscar en obra, código y título
+                    if (!obra.includes(searchTerm) && !codigo.includes(searchTerm) && !titulo.includes(searchTerm)) {
+                        mostrar = false;
+                    }
+                }
+                
+                row.style.display = mostrar ? '' : 'none';
+            });
+            
+            // Destacar términos de búsqueda
+            if (searchTerm) {
+                const regex = new RegExp(searchTerm, 'gi');
+                rows.forEach(row => {
+                    if (row.style.display !== 'none') {
+                        const obraCell = row.cells[0];
+                        const codigoCell = row.cells[1];
+                        const tituloCell = row.cells[2];
+                        
+                        // Destacar en obra
+                        obraCell.innerHTML = obraCell.textContent.replace(
+                            regex, 
+                            match => `<span class="search-highlight">${match}</span>`
+                        );
+                        
+                        // Destacar en código
+                        codigoCell.innerHTML = codigoCell.textContent.replace(
+                            regex, 
+                            match => `<span class="search-highlight">${match}</span>`
+                        );
+                        
+                        // Destacar en título
+                        tituloCell.innerHTML = tituloCell.textContent.replace(
+                            regex, 
+                            match => `<span class="search-highlight">${match}</span>`
+                        );
+                    }
+                });
+            }
+        }
+        
+        // Función para limpiar filtros
+        function limpiarFiltros() {
+            searchInput.value = '';
+            obraFilter.value = '';
+            filtrarRegistros();
+            
+            // Restaurar el contenido original de las celdas
+            const rows = tablaBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const obraCell = row.cells[0];
+                const codigoCell = row.cells[1];
+                const tituloCell = row.cells[2];
+                
+                if (obraCell.querySelector('.search-highlight')) {
+                    obraCell.innerHTML = obraCell.textContent;
+                }
+                
+                if (codigoCell.querySelector('.search-highlight')) {
+                    codigoCell.innerHTML = codigoCell.textContent;
+                }
+                
+                if (tituloCell.querySelector('.search-highlight')) {
+                    tituloCell.innerHTML = tituloCell.textContent;
+                }
+            });
+        }
+        
+        // Función para ordenar registros
+        function sortRegistros(field) {
+            if (currentSort.field === field) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+            }
+            
+            registros.sort((a, b) => {
+                let valA = a[currentSort.field];
+                let valB = b[currentSort.field];
+                
+                // Para campos de fecha
+                if (field === 'fecha') {
+                    valA = new Date(valA);
+                    valB = new Date(valB);
+                }
+                
+                // Para campos numéricos
+                if (field === 'revision' || field === 'totalCopias') {
+                    valA = Number(valA);
+                    valB = Number(valB);
+                }
+                
+                // Ordenamiento especial para obra: ordenar por obra y luego por código
+                if (field === 'obra') {
+                    if (a.obra === b.obra) {
+                        // Si la obra es la misma, ordenar por código
+                        valA = a.codigo;
+                        valB = b.codigo;
+                    } else {
+                        valA = a.obra;
+                        valB = b.obra;
+                    }
+                }
+                
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            actualizarTabla();
+        }
+        
+        // Función para actualizar la tabla con paginación
+        function actualizarTabla() {
+            tablaBody.innerHTML = '';
+            
+            if (registros.length === 0) {
+                document.getElementById('pagination-container').style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            document.getElementById('pagination-container').style.display = 'flex';
+            
+            // Calcular índices para la paginación
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const endIndex = Math.min(startIndex + recordsPerPage, registros.length);
+            
+            // Agregar registros a la tabla
+            for (let i = startIndex; i < endIndex; i++) {
+                agregarFilaTabla(registros[i], i);
+            }
+            
+            // Actualizar paginación
+            actualizarPaginacion();
+        }
+        
+        // Función para actualizar la paginación
+        function actualizarPaginacion() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(registros.length / recordsPerPage);
+            
+            // Limpiar paginación
+            pagination.innerHTML = '';
+            
+            // Botón Anterior
+            const prevItem = document.createElement('li');
+            prevItem.className = 'page-item';
+            prevItem.id = 'prev-page';
+            if (currentPage === 1) {
+                prevItem.classList.add('disabled');
+            }
+            prevItem.innerHTML = '<a class="page-link" href="#" tabindex="-1">Anterior</a>';
+            prevItem.addEventListener('click', e => {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    actualizarTabla();
+                }
+            });
+            pagination.appendChild(prevItem);
+            
+            // Números de página
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, startPage + 4);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = 'page-item';
+                if (i === currentPage) {
+                    pageItem.classList.add('active');
+                }
+                pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                pageItem.addEventListener('click', e => {
+                    e.preventDefault();
+                    currentPage = i;
+                    actualizarTabla();
+                });
+                pagination.appendChild(pageItem);
+            }
+            
+            // Botón Siguiente
+            const nextItem = document.createElement('li');
+            nextItem.className = 'page-item';
+            nextItem.id = 'next-page';
+            if (currentPage === totalPages) {
+                nextItem.classList.add('disabled');
+            }
+            nextItem.innerHTML = '<a class="page-link" href="#">Siguiente</a>';
+            nextItem.addEventListener('click', e => {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    actualizarTabla();
+                }
+            });
+            pagination.appendChild(nextItem);
+        }
+        
+        // Función para mostrar ayuda
+        function showHelp() {
+            alert("Sistema de Registro COP - Buques Mercantes\n\nInstrucciones:\n1. Complete el formulario con los datos del documento\n2. Especifique la cantidad de copias por taller\n3. Haga clic en 'Agregar Documento' para guardar\n4. Utilice los filtros para buscar documentos específicos\n5. Exporte los datos a Excel o PDF según sea necesario");
+        }
+        
+        // Función para mostrar acerca de
+        function showAbout() {
+            alert("Sistema de Registro COP - Buques Mercantes\n\nVersión: 2.0\nDesarrollado por: Departamento de Documentación Técnica\n© 2023 Todos los derechos reservados");
+        }
+        
+        // Eventos de búsqueda y filtrado
+        searchInput.addEventListener('input', filtrarRegistros);
+        obraFilter.addEventListener('input', filtrarRegistros);
+        
+        // Eventos de ordenamiento
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                sortRegistros(th.getAttribute('data-sort'));
+            });
+        });
+        
+        // Inicializar la aplicación
+        cargarRegistros();
+    </script>
+</body>
+</html>
