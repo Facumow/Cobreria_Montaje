@@ -1174,15 +1174,17 @@
                                             <th>DN</th>
                                             <th>kg</th>
                                             <th>Espesor</th>
-                                            <th>Burlonería</th>
+                                            <th>Bulonería</th>
                                             <th>Juntas</th>
+                                            <th>Valvula</th>
+                                            <th>Accesorio</th>
                                             <th>Terminado</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tasksContainer">
                                         <tr>
-                                            <td colspan="10" class="no-tasks">No se han agregado ítems</td>
+                                            <td colspan="12" class="no-tasks">No se han agregado ítems</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -1295,14 +1297,16 @@
                                         <th>DN</th>
                                         <th>kg</th>
                                         <th>Espesor</th>
-                                        <th>Burlonería</th>
+                                        <th>Bulonería</th>
                                         <th>Juntas</th>
+                                        <th>Valvula</th>
+                                        <th>Accesorio</th>
                                         <th>Terminado</th>
                                     </tr>
                                 </thead>
                                 <tbody id="prev-tareas">
                                     <tr>
-                                        <td colspan="9" style="text-align: center; padding: 20px; color: #7f8c8d;">
+                                        <td colspan="11" style="text-align: center; padding: 20px; color: #7f8c8d;">
                                             No se han definido ítems
                                         </td>
                                     </tr>
@@ -1409,13 +1413,23 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="itemBurloneria"><i class="fas fa-cogs"></i> Burlonería</label>
+                        <label for="itemBurloneria"><i class="fas fa-cogs"></i> Bulonería</label>
                         <input type="text" id="itemBurloneria" class="form-control" placeholder="Letras y números">
                     </div>
 
                     <div class="form-group">
                         <label for="itemJuntas"><i class="fas fa-ring"></i> Juntas</label>
                         <input type="text" id="itemJuntas" class="form-control" placeholder="Letras y números">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemValvula"><i class="fas fa-door-closed"></i> Valvula</label>
+                        <input type="text" id="itemValvula" class="form-control" placeholder="Letras y números">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemAccesorio"><i class="fas fa-puzzle-piece"></i> Accesorio</label>
+                        <input type="text" id="itemAccesorio" class="form-control" placeholder="Letras y números">
                     </div>
                     
                     <div class="form-group">
@@ -1649,6 +1663,8 @@
             document.getElementById('itemEspesor').value = item.espesor;
             document.getElementById('itemBurloneria').value = item.burloneria;
             document.getElementById('itemJuntas').value = item.juntas;
+            document.getElementById('itemValvula').value = item.valvula;
+            document.getElementById('itemAccesorio').value = item.accesorio;
             document.getElementById('itemTerminado').value = item.terminado;
             
             editingItemId = id;
@@ -1677,6 +1693,8 @@
                 espesor: document.getElementById('itemEspesor').value || "-",
                 burloneria: document.getElementById('itemBurloneria').value || "-",
                 juntas: document.getElementById('itemJuntas').value || "-",
+                valvula: document.getElementById('itemValvula').value || "-",
+                accesorio: document.getElementById('itemAccesorio').value || "-",
                 terminado: document.getElementById('itemTerminado').value || "-"
             };
             
@@ -1703,7 +1721,7 @@
         function renderItems() {
             const container = document.getElementById('tasksContainer');
             if (items.length === 0) {
-                container.innerHTML = `<tr><td colspan="10" class="no-tasks">No se han agregado ítems</td></tr>`;
+                container.innerHTML = `<tr><td colspan="12" class="no-tasks">No se han agregado ítems</td></tr>`;
                 return;
             }
             
@@ -1719,6 +1737,8 @@
                     <td>${item.espesor}</td>
                     <td>${item.burloneria}</td>
                     <td>${item.juntas}</td>
+                    <td>${item.valvula}</td>
+                    <td>${item.accesorio}</td>
                     <td>${item.terminado}</td>
                     <td class="task-actions">
                         <button class="btn btn-edit" onclick="editItem(${item.id})"><i class="fas fa-edit"></i></button>
@@ -1765,7 +1785,7 @@
             tbody.innerHTML = '';
             
             if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 20px; color: #7f8c8d;">No se han definido ítems</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 20px; color: #7f8c8d;">No se han definido ítems</td></tr>`;
                 return;
             }
             
@@ -1780,6 +1800,8 @@
                     <td>${item.espesor}</td>
                     <td>${item.burloneria}</td>
                     <td>${item.juntas}</td>
+                    <td>${item.valvula}</td>
+                    <td>${item.accesorio}</td>
                     <td>${item.terminado}</td>
                 `;
                 tbody.appendChild(row);
@@ -1987,7 +2009,7 @@
             
             y = doc.lastAutoTable.finalY + 10;
             
-            const headers = [['N°', 'N° de Tubería', 'Ubicación', 'DN', 'kg', 'Espesor', 'Burlonería', 'Juntas', 'Terminado']];
+            const headers = [['N°', 'N° de Tubería', 'Ubicación', 'DN', 'kg', 'Espesor', 'Bulonería', 'Juntas', 'Valvula', 'Accesorio', 'Terminado']];
             const body = items.map(item => [
                 item.number,
                 item.codigo,
@@ -1997,6 +2019,8 @@
                 item.espesor,
                 item.burloneria,
                 item.juntas,
+                item.valvula,
+                item.accesorio,
                 item.terminado
             ]);
             
