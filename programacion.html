@@ -3,1954 +3,2023 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro COP - Buques Mercantes</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Sistema de Tarjetas - Taller de Cobrería | Astillero Río Santiago</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
-            --primary-color: #1a3a5f;
-            --secondary-color: #2c5f8a;
-            --accent-color: #4a9bd8;
-            --light-color: #e8f4ff;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --info-color: #17a2b8;
+            --primary: #1e3a8a; /* Azul oscuro intenso */
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            --secondary: #0ea5e9; /* Cian brillante */
+            --accent: #f43f5e; /* Rosa */
+            --success: #10b981; /* Verde esmeralda */
+            --warning: #f97316; /* Naranja */
+            --light-gray: #f8fafc;
+            --medium-gray: #e2e8f0;
+            --dark-gray: #475569;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --cobreria-color: var(--primary);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #e0f0ff 0%, #f5f9ff 100%);
+            background-color: var(--light-gray);
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-            padding-bottom: 50px;
+            padding: 24px;
+            color: var(--text-primary);
+            position: relative;
         }
         
-        .header {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-size: 18rem;
+            opacity: 0.02;
+            color: var(--primary);
+            pointer-events: none;
+            z-index: 0;
+            font-weight: 900;
+            text-transform: uppercase;
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 4px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header Corporativo */
+        .header-card {
+            background: white;
+            color: var(--text-primary);
+            border-radius: var(--border-radius);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .header-left h1 {
+            font-size: 1.75rem;
+            margin-bottom: 4px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .header-left h2 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+        
+        .header-left h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+        
+        .logo-container {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--border-radius);
+            padding: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-placeholder {
+            width: 120px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 25px 0;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            font-weight: bold;
+            font-size: 1.5rem;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Contenido Principal */
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
             margin-bottom: 30px;
         }
         
-        .app-title {
-            font-weight: 700;
-            font-size: 2.2rem;
-            letter-spacing: 0.5px;
-        }
-        
-        .app-subtitle {
-            font-weight: 300;
-            font-size: 1.1rem;
-            opacity: 0.9;
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
         }
         
         .card {
-            border-radius: 15px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-            border: none;
-            margin-bottom: 25px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid var(--medium-gray);
+            transition: all 0.3s ease;
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
         
         .card-header {
-            background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+            background: var(--cobreria-color);
             color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card-header i {
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.1);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-header h2 {
+            font-size: 1.25rem;
             font-weight: 600;
-            padding: 15px 20px;
-            border-radius: 15px 15px 0 0 !important;
         }
         
-        .form-control, .btn, .form-select {
-            border-radius: 8px !important;
+        .card-body {
+            padding: 24px;
+            flex-grow: 1;
         }
         
-        .btn-primary {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            border: none;
-            transition: all 0.3s ease;
+        /* Formulario */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
         
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(26, 58, 95, 0.3);
-        }
-        
-        .btn-success {
-            background: linear-gradient(to right, var(--success-color), #1e7e34);
-            border: none;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(to right, var(--danger-color), #bd2130);
-            border: none;
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(to right, #6c757d, #5a6268);
-            border: none;
-        }
-        
-        .btn-info {
-            background: linear-gradient(to right, var(--info-color), #138496);
-            border: none;
-        }
-        
-        .btn-warning {
-            background: linear-gradient(to right, var(--warning-color), #e0a800);
-            border: none;
-        }
-        
-        .table thead th {
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-            vertical-align: middle;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .table thead th:hover {
-            background-color: #0d2a47;
-        }
-        
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(74, 155, 216, 0.05);
-        }
-        
-        .table-hover tbody tr:hover {
-            background-color: rgba(74, 155, 216, 0.15);
-        }
-        
-        .action-buttons .btn {
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-        }
-        
-        .action-buttons .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--primary-color);
-            color: white;
-            text-align: center;
-            padding: 12px 0;
-            font-size: 0.9rem;
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 15px;
-            border-radius: 12px;
-            color: white;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-card i {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .stat-card .number {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-        
-        .stat-card .label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        .stat-card.blue {
-            background: linear-gradient(135deg, #4a9bd8, #2c5f8a);
-        }
-        
-        .stat-card.green {
-            background: linear-gradient(135deg, #28a745, #1e7e34);
-        }
-        
-        .stat-card.orange {
-            background: linear-gradient(135deg, #fd7e14, #e36209);
-        }
-        
-        .stat-card.purple {
-            background: linear-gradient(135deg, #6f42c1, #563d7c);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6c757d;
-        }
-        
-        .empty-state i {
-            font-size: 4rem;
-            opacity: 0.3;
-            margin-bottom: 20px;
-        }
-        
-        .empty-state h3 {
-            font-weight: 500;
-            margin-bottom: 15px;
-        }
-        
-        .taller-card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-        
-        .taller-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateY(-3px);
-        }
-        
-        .taller-card h5 {
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .related-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            height: 100%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--accent-color);
-            transition: all 0.3s ease;
-        }
-        
-        .related-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        }
-        
-        .related-card h5 {
-            color: var(--primary-color);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .related-card ul {
-            padding-left: 20px;
+        .form-group {
             margin-bottom: 0;
         }
         
-        .related-card ul li {
+        .form-group label {
+            display: block;
             margin-bottom: 8px;
-        }
-        
-        .badge-custom {
-            background: var(--accent-color);
-            color: white;
             font-weight: 500;
-            padding: 5px 10px;
-            border-radius: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.875rem;
         }
         
-        .description-cell {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .required::after {
+            content: "*";
+            color: var(--accent);
+            margin-left: 4px;
         }
         
-        .description-cell:hover {
-            white-space: normal;
-            overflow: visible;
-            z-index: 100;
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 6px;
+            font-size: 0.9rem;
             background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            color: var(--text-primary);
+            transition: all 0.2s ease-in-out;
         }
         
-        .taller-badge {
-            display: inline-block;
-            background: var(--secondary-color);
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+        
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: var(--primary);
             color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            margin-right: 5px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-print {
+            background: var(--primary);
+        }
+        
+        .btn-print:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-export {
+            background: var(--warning);
+        }
+        
+        .btn-export:hover {
+            background: #ea580c;
+        }
+        
+        .btn-add-task {
+            background: var(--success);
+        }
+        
+        .btn-add-task:hover {
+            background: #059669;
+        }
+        
+        .btn-edit {
+            background: var(--warning);
+            padding: 6px 10px;
+        }
+        
+        .btn-edit:hover {
+            background: #ea580c;
+        }
+        
+        .btn-remove {
+            background: var(--accent);
+            padding: 6px 10px;
+        }
+        
+        .btn-remove:hover {
+            background: #e11d48;
+        }
+        
+        .btn-delete-all {
+            background: var(--accent);
+        }
+        
+        .btn-delete-all:hover {
+            background: #e11d48;
+        }
+        
+        .btn-save-template {
+            background: #0891b2;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-save-template:hover {
+            background: #0e7490;
+        }
+        
+        .btn-new-card {
+            background: var(--success);
+        }
+        
+        .btn-new-card:hover {
+            background: #059669;
+        }
+        
+        .btn-secondary {
+            background: var(--dark-gray);
+        }
+        
+        .btn-secondary:hover {
+            background: #334155;
+        }
+        
+        /* Vista Previa - Optimizada para impresión */
+        .preview-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            position: relative;
+            border: 1px solid var(--medium-gray);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .preview-header h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            font-weight: 800;
             margin-bottom: 5px;
         }
         
-        .filter-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
+        .preview-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
         
-        .obra-badge {
-            background: #5a6268;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .obra-badge:hover {
-            background: var(--accent-color);
-            transform: scale(1.05);
-        }
-        
-        .search-highlight {
-            background-color: #ffeb3b;
-            font-weight: bold;
-        }
-        
-        .print-header {
-            display: none;
-        }
-        
-        .sort-indicator {
-            margin-left: 5px;
-            font-size: 0.8em;
-        }
-        
-        .pagination-container {
+        .preview-column {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .preview-item {
+            display: flex;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .preview-label {
+            font-weight: 600;
+            min-width: 140px;
+            color: var(--text-primary);
+        }
+        
+        .preview-value {
+            flex: 1;
+            word-break: break-word;
+            color: var(--text-secondary);
+        }
+        
+        .preview-table-container {
             margin-top: 20px;
+            overflow-x: auto;
         }
         
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 8px;
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .preview-table th {
+            background: var(--primary);
             color: white;
-            font-weight: 500;
-            z-index: 1050;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
         }
         
-        .notification.show {
-            transform: translateX(0);
+        .preview-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--medium-gray);
+            vertical-align: top;
         }
         
-        .notification.success {
-            background: linear-gradient(135deg, var(--success-color), #1e7e34);
+        .distribution-list {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--medium-gray);
         }
         
-        .notification.error {
-            background: linear-gradient(135deg, var(--danger-color), #bd2130);
+        .distribution-list h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .notification.info {
-            background: linear-gradient(135deg, var(--info-color), #138496);
-        }
-        
-        .tarjeta-badge {
-            display: inline-block;
-            background: #6f42c1;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
+        .distribution-emails {
+            background: var(--light-gray);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--medium-gray);
+            font-family: monospace;
             font-size: 0.85rem;
-            margin: 2px;
+            line-height: 1.6;
+            color: var(--text-secondary);
         }
         
-        .tipo-ingreso-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
+        /* Responsable destacado */
+        .responsable-section {
+            background: #eff6ff; /* Light blue */
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .responsable-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .signature-area {
+            border-top: 1px dashed var(--primary-light);
+            padding-top: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .signature-line {
+            width: 70%;
+            height: 1px;
+            background: var(--text-secondary);
+            margin: 25px auto 8px;
+        }
+        
+        .signature-label {
             font-size: 0.8rem;
-            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: center;
         }
         
-        .badge-papel {
-            background: #4a9bd8;
+        /* Sección de Tareas */
+        .task-section {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        .task-list {
+            margin-top: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            background: var(--light-gray);
+        }
+        
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .task-table th {
+            background: var(--dark-gray);
             color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
         }
         
-        .badge-digital {
-            background: #28a745;
-            color: white;
+        .task-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--medium-gray);
+            vertical-align: middle;
         }
         
-        .badge-ambas {
-            background: #6f42c1;
-            color: white;
+        .task-table tr:nth-child(even) {
+            background-color: white;
         }
         
+        .task-table tr:hover {
+            background-color: #eef2ff;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .no-tasks {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        /* Modal para Ítems */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 32px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        .close-modal:hover {
+            color: var(--text-primary);
+        }
+        
+        .modal-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        /* Buscador */
+        .search-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .search-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .search-header i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .search-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .search-results {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            background: var(--light-gray);
+        }
+        
+        .result-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--medium-gray);
+            transition: background-color 0.2s;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item:hover {
+            background-color: #eef2ff;
+        }
+        
+        .result-item h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .result-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .result-detail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .saveable-section {
+            background: #eff6ff;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 4px solid var(--secondary);
+            grid-column: 1 / -1;
+        }
+        
+        .saveable-section h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .saveable-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .template-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .template-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .template-item:last-child {
+            border-bottom: none;
+        }
+        
+        .template-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        /* Footer Global */
+        .global-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--medium-gray);
+        }
+
+        /* Estilo para impresión (NO MODIFICAR) */
         @media print {
-            body * {
-                visibility: hidden;
+            @page {
+                margin: 0.5cm;
+                size: A4;
             }
             
-            .print-section, .print-section * {
-                visibility: visible;
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+                font-size: 10pt;
+                line-height: 1.3;
+                height: auto;
+                max-height: none !important;
+                overflow: visible !important;
+                font-family: 'Times New Roman', Times, serif; /* Fuente clásica para impresión */
             }
             
-            .print-section {
-                position: absolute;
-                left: 0;
-                top: 0;
+            .no-print {
+                display: none !important;
+            }
+            
+            .container {
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .preview-card {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin: 0;
                 width: 100%;
-                padding: 20px;
+                position: relative;
+                page-break-inside: auto;
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
             }
             
-            .print-header {
-                display: block;
-                text-align: center;
-                margin-bottom: 20px;
-                border-bottom: 2px solid #333;
-                padding-bottom: 10px;
+            .preview-header {
+                margin-bottom: 8px;
+                padding-bottom: 5px;
+                border-bottom: 2px solid black;
             }
             
-            .print-header h2 {
+            .preview-header h2 {
+                font-size: 14pt;
+                color: black;
+            }
+            
+            .preview-header p {
+                font-size: 9pt;
+                color: black;
+            }
+            
+            .preview-item {
+                padding: 5px 0;
+                font-size: 9pt;
+                border-bottom: none;
+            }
+            
+            .preview-label {
+                min-width: 110px;
+                font-weight: bold;
+                font-size: 9pt;
+                color: black;
+            }
+            
+            .preview-value {
+                font-size: 9pt;
+                color: black;
+            }
+            
+            .preview-table {
+                width: 100%;
+                font-size: 8pt;
+                page-break-inside: auto;
+            }
+            
+            .preview-table th {
+                background: #ccc !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+
+            .preview-table th, 
+            .preview-table td {
+                padding: 6px 8px;
+                font-size: 8pt;
+                border: 1px solid #666;
+            }
+            
+            .preview-table tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            
+            .preview-table-container,
+            .task-list {
+                max-height: none !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+            
+            .distribution-list h4 {
+                font-size: 10pt;
+            }
+            
+            .distribution-emails {
+                font-size: 8pt;
+                padding: 8px;
+                border: 1px solid #666;
+            }
+            
+            .responsable-section {
+                background: #f0f0f0 !important;
+                padding: 10px;
+                margin-top: 10px;
+                border: 1px solid black;
+                page-break-inside: avoid;
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+            
+            .responsable-section h3 {
+                font-size: 10pt;
                 margin-bottom: 5px;
             }
             
-            .print-footer {
-                text-align: center;
-                margin-top: 20px;
-                font-size: 0.9rem;
-                color: #666;
+            .signature-area {
+                margin-top: 15px;
+                padding-top: 5px;
+            }
+            
+            .signature-line {
+                width: 50%;
+                margin: 15px auto 3px;
+                background: black;
+            }
+            
+            .signature-label {
+                font-size: 8pt;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Notifications -->
-    <div class="notification" id="notification">
-        <i class="fas fa-check-circle me-2"></i>
-        <span id="notification-message">Operación realizada con éxito</span>
-    </div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="app-title"><i class="fas fa-ship me-3"></i>Registro COP - Buques Mercantes</h1>
-                    <p class="app-subtitle">Sistema avanzado de registro de documentación para buques mercantes</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="d-flex justify-content-md-end gap-2">
-                        <button class="btn btn-light" onclick="showHelp()">
-                            <i class="fas fa-question-circle me-2"></i>Ayuda
-                        </button>
-                        <button class="btn btn-light" onclick="showAbout()">
-                            <i class="fas fa-info-circle me-2"></i>Acerca de
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
+    <div class="watermark">COBRERÍA</div>
+    
     <div class="container">
-        <!-- Estadísticas -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-card blue">
-                    <i class="fas fa-file-alt"></i>
-                    <div class="number" id="total-docs">0</div>
-                    <div class="label">Documentos Registrados</div>
-                </div>
+        <!-- Encabezado Corporativo -->
+        <div class="header-card no-print">
+            <div class="header-left">
+                <h1>ASTILLERO RÍO SANTIAGO</h1>
+                <h2>TALLER DE COBRERÍA - GERENCIA DE PRODUCCIÓN</h2>
+                <h3>OFICINA DE C.O.P</h3>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card green">
-                    <i class="fas fa-copy"></i>
-                    <div class="number" id="total-copias">0</div>
-                    <div class="label">Copias Totales</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card orange">
-                    <i class="fas fa-print"></i>
-                    <div class="number" id="copias-papel">0</div>
-                    <div class="label">Copias Papel</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card purple">
-                    <i class="fas fa-file-download"></i>
-                    <div class="number" id="copias-digital">0</div>
-                    <div class="label">Copias Digital</div>
+            <div class="header-right">
+                <div class="logo-container">
+                    <div class="logo-placeholder">ARS</div>
                 </div>
             </div>
         </div>
         
-        <!-- Formulario de Registro -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <i class="fas fa-file-import me-2"></i>
-                    <span id="form-title">Registro de Documentación</span>
-                </div>
-                <button class="btn btn-sm btn-outline-light" id="cancel-edit-btn" style="display:none;" onclick="cancelEdit()">
-                    <i class="fas fa-times me-1"></i>Cancelar Edición
-                </button>
+        <!-- Buscador de Tarjetas -->
+        <div class="search-section no-print">
+            <div class="search-header">
+                <i class="fas fa-search"></i>
+                <h2>Buscar Tarjetas de Trabajo</h2>
             </div>
-            <div class="card-body">
-                <form id="form-registro" class="row g-3">
-                    <div class="col-md-3">
-                        <label for="obra" class="form-label">Número de Obra*</label>
-                        <input type="text" class="form-control" id="obra" placeholder="Ej: 202301" required>
-                        <small class="form-text text-muted">Código numérico de la obra</small>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="codigo" class="form-label">Número de Plano*</label>
-                        <input type="text" class="form-control" placeholder="COP-2023-001" id="codigo" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="titulo" class="form-label">Título del documento*</label>
-                        <input type="text" class="form-control" placeholder="Planos de estructura" id="titulo" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="revision" class="form-label">Revisión*</label>
-                        <input type="number" class="form-control" placeholder="3" id="revision" min="0" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="fecha" class="form-label">Fecha*</label>
-                        <input type="date" class="form-control" id="fecha" required>
-                    </div>
-                    
-                    <!-- Campo para Tipo de Ingreso -->
-                    <div class="col-md-3">
-                        <label for="tipo-ingreso" class="form-label">Tipo de Ingreso*</label>
-                        <select class="form-select" id="tipo-ingreso" required>
-                            <option value="" disabled selected>Seleccionar...</option>
-                            <option value="Copia Papel">Copia Papel</option>
-                            <option value="Digital">Digital</option>
-                            <option value="Ambas">Ambas</option>
-                        </select>
-                    </div>
-                    
-                    <div class="col-md-3">
-                        <label for="planos" class="form-label">Planos Relacionados</label>
-                        <input type="text" class="form-control" placeholder="COP-2023-002, COP-2023-005" id="planos">
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <label for="tarjetas-trabajo" class="form-label">Tarjetas de Trabajo Asociadas</label>
-                        <input type="text" class="form-control" placeholder="T-001, T-002" id="tarjetas-trabajo">
-                        <small class="form-text text-muted">Ingrese códigos separados por comas</small>
-                    </div>
-                    
-                    <div class="col-md-12">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="descripcion" placeholder="Detalles técnicos del documento..." rows="2"></textarea>
-                    </div>
-                    
-                    <div class="col-md-12 mt-3">
-                        <h5><i class="fas fa-copy me-2"></i>Cantidad de Copias por Taller</h5>
-                        <div class="row g-3">
-                            <div class="col-md-2">
-                                <label for="taller-a" class="form-label">Cobrería (Cob)</label>
-                                <input type="number" class="form-control" id="taller-a" min="0" value="0">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="taller-b" class="form-label">Trat. Superf. (TS)</label>
-                                <input type="number" class="form-control" id="taller-b" min="0" value="0">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="taller-c" class="form-label">Electromec. (Elec)</label>
-                                <input type="number" class="form-control" id="taller-c" min="0" value="0">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="taller-d" class="form-label">Carpintería (Carp)</label>
-                                <input type="number" class="form-control" id="taller-d" min="0" value="0">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="taller-e" class="form-label">Chapa Fina (CF)</label>
-                                <input type="number" class="form-control" id="taller-e" min="0" value="0">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="taller-f" class="form-label">Mat. Comp. (MC)</label>
-                                <input type="number" class="form-control" id="taller-f" min="0" value="0">
-                            </div>
-                            <!-- Nuevo taller COP -->
-                            <div class="col-md-2">
-                                <label for="taller-g" class="form-label">COP</label>
-                                <input type="number" class="form-control" id="taller-g" min="0" value="0">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-12 mt-3">
-                        <button type="submit" class="btn btn-primary w-100 py-2" id="submit-btn">
-                            <i class="fas fa-plus-circle me-2"></i>Agregar Documento
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Tarjetas Relacionadas -->
-        <div class="row mb-4 related-cards-section">
-            <div class="col-md-4">
-                <div class="related-card">
-                    <h5><i class="fas fa-star me-2 text-warning"></i>Documentos Recientes</h5>
-                    <ul id="recent-docs">
-                        <li>No hay documentos recientes</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="related-card">
-                    <h5><i class="fas fa-chart-pie me-2 text-info"></i>Distribución de Copias</h5>
-                    <canvas id="copias-chart" height="200"></canvas>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="related-card">
-                    <h5><i class="fas fa-tools me-2 text-success"></i>Talleres con Más Copias</h5>
-                    <ul id="top-talleres">
-                        <li>No hay datos disponibles</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sección de Filtros -->
-        <div class="filter-section">
-            <div class="row">
-                <div class="col-md-8">
-                    <h5><i class="fas fa-filter me-2"></i>Filtros</h5>
-                    <div class="d-flex gap-3">
-                        <div class="flex-grow-1">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control" placeholder="Buscar por obra, número de plano o título..." id="search-input">
-                            </div>
-                        </div>
-                        <div class="w-25">
-                            <input type="text" class="form-control" placeholder="Filtrar por obra..." id="obra-filter">
-                        </div>
-                        <button class="btn btn-outline-secondary" onclick="limpiarFiltros()">
-                            <i class="fas fa-times"></i> Limpiar
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <h5><i class="fas fa-list me-2"></i>Obras Recientes</h5>
-                    <div class="d-flex flex-wrap gap-2" id="obras-list">
-                        <span class="text-muted">No hay obras registradas</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sección de Talleres -->
-        <div class="row mb-4 talleres-section">
-            <div class="col-md-12">
-                <h4 class="mb-3"><i class="fas fa-warehouse me-2"></i>Resumen por Taller</h4>
-                <div class="row">
-                    <div class="col-md-2">
-                        <div class="taller-card">
-                            <h5>Cobrería <span class="taller-badge">Cob</span></h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Copias:</span>
-                                <span class="badge-custom" id="taller-a-total">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="taller-card">
-                            <h5>Trat. Superf. <span class="taller-badge">TS</span></h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Copias:</span>
-                                <span class="badge-custom" id="taller-b-total">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="taller-card">
-                            <h5>Electromec. <span class="taller-badge">Elec</span></h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Copias:</span>
-                                <span class="badge-custom" id="taller-c-total">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="taller-card">
-                            <h5>Carpintería <span class="taller-badge">Carp</span></h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Copias:</span>
-                                <span class="badge-custom" id="taller-d-total">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="taller-card">
-                            <h5>Chapa Fina <span class="taller-badge">CF</span></h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Copias:</span>
-                                <span class="badge-custom" id="taller-e-total">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="taller-card">
-                            <h5>Mat. Comp. <span class="taller-badge">MC</span></h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Copias:</span>
-                                <span class="badge-custom" id="taller-f-total">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Nuevo taller COP -->
-                    <div class="col-md-2">
-                        <div class="taller-card">
-                            <h5>COP</h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Copias:</span>
-                                <span class="badge-custom" id="taller-g-total">0</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Tabla de Registros -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <i class="fas fa-table me-2"></i>Documentos Registrados
-                    <span class="ms-2 text-muted fw-normal">(<span id="total-registros">0</span> registros)</span>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-light" onclick="clearTable()">
-                        <i class="fas fa-trash-alt me-1"></i>Limpiar
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive" id="tabla-container">
-                    <table class="table table-striped table-hover table-bordered" id="tabla">
-                        <thead class="table-light">
-                            <tr>
-                                <th data-sort="obra">Obra <span class="sort-indicator">▼</span></th>
-                                <th data-sort="codigo">Número de Plano</th>
-                                <th data-sort="titulo">Título</th>
-                                <th data-sort="revision">Revisión</th>
-                                <th data-sort="fecha">Fecha</th>
-                                <th data-sort="tipoIngreso">Tipo Ingreso</th>
-                                <th>Descripción</th>
-                                <th>Planos Relacionados</th>
-                                <th>Tarjetas Trabajo</th>
-                                <th data-sort="totalCopias">Copias Totales</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body">
-                            <!-- Las filas se agregarán dinámicamente -->
-                        </tbody>
-                    </table>
+            
+            <div class="search-form">
+                <div class="form-group">
+                    <label for="searchObra"><i class="fas fa-barcode"></i> Nº Obra</label>
+                    <input type="text" id="searchObra" class="form-control" placeholder="Buscar por número de obra...">
                 </div>
                 
-                <!-- Paginación -->
-                <div class="pagination-container" id="pagination-container">
-                    <nav>
-                        <ul class="pagination" id="pagination">
-                            <li class="page-item disabled" id="prev-page">
-                                <a class="page-link" href="#" tabindex="-1">Anterior</a>
-                            </li>
-                            <!-- Las páginas se generan dinámicamente -->
-                            <li class="page-item" id="next-page">
-                                <a class="page-link" href="#">Siguiente</a>
-                            </li>
-                        </ul>
-                    </nav>
+                <div class="form-group">
+                    <label for="searchPlano"><i class="fas fa-drafting-compass"></i> Número de Plano</label>
+                    <input type="text" id="searchPlano" class="form-control" placeholder="Buscar por número de plano...">
                 </div>
                 
-                <!-- Estado vacío -->
-                <div class="empty-state" id="empty-state">
-                    <i class="fas fa-inbox"></i>
-                    <h3>No hay documentos registrados</h3>
-                    <p class="mb-0">Comienza agregando documentos utilizando el formulario superior</p>
+                <div class="form-group">
+                    <label for="searchTitulo"><i class="fas fa-heading"></i> Título de Tarjeta</label>
+                    <input type="text" id="searchTitulo" class="form-control" placeholder="Buscar por título...">
                 </div>
+                
+                <div class="form-group">
+                    <label for="searchFecha"><i class="fas fa-calendar-alt"></i> Fecha Emisión</label>
+                    <input type="date" id="searchFecha" class="form-control">
+                </div>
+            </div>
+            
+            <button class="btn" id="btnBuscar">
+                <i class="fas fa-search"></i> Buscar Tarjetas
+            </button>
+            
+            <div class="search-results" id="searchResults">
+                <div class="no-tasks">Realice una búsqueda para ver resultados</div>
             </div>
         </div>
         
-        <!-- Botones de Acción -->
-        <div class="action-buttons mt-4 d-flex gap-2">
-            <button class="btn btn-success flex-grow-1" onclick="exportarExcel()">
-                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
-            </button>
-            <button class="btn btn-danger flex-grow-1" onclick="guardarPDF()">
-                <i class="fas fa-file-pdf me-2"></i>Guardar como PDF
-            </button>
-            <button class="btn btn-info flex-grow-1" onclick="imprimirTabla()">
-                <i class="fas fa-print me-2"></i>Imprimir
-            </button>
-        </div>
-    </div>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    Sistema de Registro COP - Buques Mercantes &copy; 2023 | Todos los derechos reservados
+        <!-- Contenido Principal -->
+        <div class="app-container">
+            <!-- Panel de Formulario -->
+            <div class="card no-print">
+                <div class="card-header">
+                    <i class="fas fa-edit"></i>
+                    <h2>Crear/Editar Tarjeta de Montaje</h2>
                 </div>
-            </div>
-        </div>
-    </footer>
-    
-    <!-- Modal de Detalles -->
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Detalles del Documento</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h6>Obra</h6>
-                            <p id="detail-obra" class="fw-bold">-</p>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="numeroTarjeta"><i class="fas fa-hashtag"></i> N° Tarjeta</label>
+                            <input type="text" id="numeroTarjeta" class="form-control" value="CB-0001">
                         </div>
-                        <div class="col-md-6">
-                            <h6>Número de Plano</h6>
-                            <p id="detail-codigo" class="fw-bold">-</p>
+                        
+                        <div class="form-group">
+                            <label class="required" for="fechaEmision"><i class="fas fa-calendar-alt"></i> Fecha Emisión</label>
+                            <input type="date" id="fechaEmision" class="form-control" value="">
                         </div>
-                        <div class="col-md-6">
-                            <h6>Título</h6>
-                            <p id="detail-titulo" class="fw-bold">-</p>
+                        
+                        <div class="form-group">
+                            <label class="required" for="fechaNecesidad"><i class="fas fa-calendar-day"></i> Fecha de Necesidad</label>
+                            <input type="date" id="fechaNecesidad" class="form-control" value="">
                         </div>
-                        <div class="col-md-3">
-                            <h6>Revisión</h6>
-                            <p id="detail-revision" class="fw-bold">-</p>
+                        
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="required" for="tituloTarjeta"><i class="fas fa-heading"></i> Título de Tarjeta</label>
+                            <input type="text" id="tituloTarjeta" class="form-control" value="" placeholder="Describa el trabajo a realizar">
                         </div>
-                        <div class="col-md-3">
-                            <h6>Fecha</h6>
-                            <p id="detail-fecha" class="fw-bold">-</p>
+                        
+                        <div class="form-group">
+                            <label for="numeroPlano"><i class="fas fa-drafting-compass"></i> Número de Plano</label>
+                            <input type="text" id="numeroPlano" class="form-control" value="" placeholder="Ingrese el número de plano">
                         </div>
-                        <div class="col-md-6">
-                            <h6>Tipo de Ingreso</h6>
-                            <p id="detail-tipo-ingreso" class="fw-bold">-</p>
+                        
+                        <div class="form-group">
+                            <label for="inspeccionCalidad"><i class="fas fa-clipboard-check"></i> N° Inspección Calidad</label>
+                            <input type="text" id="inspeccionCalidad" class="form-control" placeholder="Por completar">
                         </div>
-                        <div class="col-md-6">
-                            <h6>Copias Totales</h6>
-                            <p id="detail-copias" class="fw-bold">-</p>
+                        
+                        <div class="form-group">
+                            <label for="medioSolicitud"><i class="fas fa-comment"></i> Medio de Solicitud</label>
+                            <select id="medioSolicitud" class="form-control">
+                                <option value="Informal" selected>Informal</option>
+                                <option value="Formal">Formal</option>
+                                <option value="Escrita">Escrita</option>
+                            </select>
                         </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h6>Descripción</h6>
-                        <p id="detail-descripcion" class="text-muted">No hay descripción disponible</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h6>Planos Relacionados</h6>
-                        <p id="detail-planos" class="text-muted">No se especificaron planos relacionados</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h6>Tarjetas de Trabajo Asociadas</h6>
-                        <p id="detail-tarjetas" class="text-muted">No se especificaron tarjetas de trabajo</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h6 class="mb-3">Distribución de Copias</h6>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="d-flex justify-content-between">
-                                    <span>Cobrería (Cob):</span>
-                                    <span id="detail-taller-a" class="fw-bold">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="d-flex justify-content-between">
-                                    <span>Trat. Superf. (TS):</span>
-                                    <span id="detail-taller-b" class="fw-bold">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="d-flex justify-content-between">
-                                    <span>Electromec. (Elec):</span>
-                                    <span id="detail-taller-c" class="fw-bold">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="d-flex justify-content-between">
-                                    <span>Carpintería (Carp):</span>
-                                    <span id="detail-taller-d" class="fw-bold">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="d-flex justify-content-between">
-                                    <span>Chapa Fina (CF):</span>
-                                    <span id="detail-taller-e" class="fw-bold">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="d-flex justify-content-between">
-                                    <span>Mat. Comp. (MC):</span>
-                                    <span id="detail-taller-f" class="fw-bold">0</span>
-                                </div>
-                            </div>
-                            <!-- Nuevo taller COP -->
-                            <div class="col-md-4">
-                                <div class="d-flex justify-content-between">
-                                    <span>COP:</span>
-                                    <span id="detail-taller-g" class="fw-bold">0</span>
-                                </div>
-                            </div>
+                        
+                        <div class="form-group">
+                            <label class="required" for="sectorSolicitante"><i class="fas fa-building"></i> Sector Solicitante</label>
+                            <input type="text" id="sectorSolicitante" class="form-control" value="" placeholder="Sector solicitante">
                         </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Sección oculta para impresión -->
-    <div class="print-section" style="display: none;">
-        <div class="print-header">
-            <h2>Registro COP - Buques Mercantes</h2>
-            <p>Reporte de documentos registrados - Fecha: <span id="print-date"></span></p>
-        </div>
-        <div id="print-table-container"></div>
-        <div class="print-footer">
-            <p>Sistema de Registro COP - Generado el <span id="print-footer-date"></span></p>
-        </div>
-    </div>
+                        
+                        <div class="form-group">
+                            <label class="required" for="solicitante"><i class="fas fa-user"></i> Solicitante</label>
+                            <input type="text" id="solicitante" class="form-control" value="" placeholder="Nombre del solicitante">
+                        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                        <div class="form-group">
+                            <label for="zonaMontaje"><i class="fas fa-map-pin"></i> Zona de Montaje</label>
+                            <input type="text" id="zonaMontaje" class="form-control" placeholder="Letras y números">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required" for="horasEstimadas"><i class="fas fa-clock"></i> Horas Hombre Estimadas</label>
+                            <input type="number" id="horasEstimadas" class="form-control" value="" min="1" placeholder="Horas estimadas">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="materialVales"><i class="fas fa-ticket-alt"></i> Material en Vales</label>
+                            <input type="text" id="materialVales" class="form-control" value="" placeholder="Números y letras de vales">
+                        </div>
+                        
+                        <!-- Sección de Obra - Guardable -->
+                        <div class="saveable-section">
+                            <h4><i class="fas fa-barcode"></i> Obra Asignada</h4>
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                                <div class="form-group">
+                                    <label class="required" for="obraCodigo">Código de Obra</label>
+                                    <input type="text" id="obraCodigo" class="form-control" placeholder="Código de obra" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="obraDescripcion">Descripción</label>
+                                    <input type="text" id="obraDescripcion" class="form-control" placeholder="Descripción de la obra">
+                                </div>
+                                <div class="form-group" style="grid-column: 1 / -1;">
+                                    <label for="planObras">Plan de Obras</label>
+                                    <input type="text" id="planObras" class="form-control" placeholder="Plan de obras (números y letras)">
+                                </div>
+                                <div class="form-group" style="grid-column: 1 / -1;">
+                                    <label for="obrasGuardadas">Obras Guardadas</label>
+                                    <select id="obrasGuardadas" class="form-control" onchange="seleccionarObra(this)">
+                                        <option value="">Seleccionar obra guardada...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="saveable-controls">
+                                <button class="btn btn-save-template" id="btnSaveObra">
+                                    <i class="fas fa-save"></i> Guardar Obra
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Responsable - Guardable -->
+                        <div class="saveable-section">
+                            <h4><i class="fas fa-user-tie"></i> Responsable</h4>
+                             <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                                <div class="form-group">
+                                    <label class="required" for="responsableNombre">Nombre</label>
+                                    <input type="text" id="responsableNombre" class="form-control" placeholder="Nombre del responsable..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="required" for="responsableCargo">Cargo</label>
+                                    <input type="text" id="responsableCargo" class="form-control" placeholder="Cargo del responsable..." required>
+                                </div>
+                                <div class="form-group" style="grid-column: 1 / -1;">
+                                    <label class="required" for="contactoResponsable"><i class="fas fa-phone"></i> Contacto</label>
+                                    <input type="text" id="contactoResponsable" class="form-control" placeholder="Contacto del responsable" required>
+                                </div>
+                                <div class="form-group" style="grid-column: 1 / -1;">
+                                    <label for="responsablesGuardados">Responsables Guardados</label>
+                                    <select id="responsablesGuardados" class="form-control" onchange="seleccionarResponsable(this)">
+                                        <option value="">Seleccionar responsable guardado...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="saveable-controls">
+                                <button class="btn btn-save-template" id="btnSaveResponsable">
+                                    <i class="fas fa-save"></i> Guardar Responsable
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Lista de Distribución - Guardable -->
+                        <div class="saveable-section">
+                            <h4><i class="fas fa-envelope"></i> Lista de Distribución</h4>
+                             <div class="form-grid" style="grid-template-columns: 1fr;">
+                                <div class="form-group">
+                                    <label class="required" for="listaDistribucion">Correos Electrónicos</label>
+                                    <textarea id="listaDistribucion" class="form-control" rows="3" placeholder="Ingrese correos electrónicos separados por coma" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nombreListaDistribucion">Nombre de la Lista</label>
+                                    <input type="text" id="nombreListaDistribucion" class="form-control" placeholder="Nombre para guardar esta lista">
+                                </div>
+                                <div class="form-group">
+                                    <label for="listasDistribucionGuardadas">Listas Guardadas</label>
+                                    <select id="listasDistribucionGuardadas" class="form-control" onchange="seleccionarListaDistribucion(this)">
+                                        <option value="">Seleccionar lista guardada...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="saveable-controls">
+                                <button class="btn btn-save-template" id="btnSaveDistribucion">
+                                    <i class="fas fa-save"></i> Guardar Lista
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Sección de Descripción de Tareas -->
+                        <div class="task-section">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                                <h3 style="font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 8px;"><i class="fas fa-tasks"></i> Descripción de Tareas por Ítem</h3>
+                                <div>
+                                    <button id="btnAddItem" class="btn btn-add-task">
+                                        <i class="fas fa-plus-circle"></i> Agregar Ítem
+                                    </button>
+                                    <button id="btnDeleteAll" class="btn btn-delete-all">
+                                        <i class="fas fa-trash-alt"></i> Eliminar Todos
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="task-list">
+                                <table class="task-table" id="tasksTable">
+                                    <thead>
+                                        <tr>
+                                            <th>N°</th>
+                                            <th>N° de Tubería</th>
+                                            <th>Ubicación</th>
+                                            <th>DN</th>
+                                            <th>kg</th>
+                                            <th>Espesor</th>
+                                            <th>Burlonería</th>
+                                            <th>Juntas</th>
+                                            <th>Terminado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tasksContainer">
+                                        <tr>
+                                            <td colspan="10" class="no-tasks">No se han agregado ítems</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+                        <button class="btn" id="btnGenerar">
+                            <i class="fas fa-sync-alt"></i> Actualizar Vista Previa
+                        </button>
+                        <button class="btn btn-add-task" id="btnGuardar">
+                            <i class="fas fa-save"></i> Guardar Tarjeta
+                        </button>
+                        <button class="btn btn-new-card" id="btnNuevaTarjeta">
+                            <i class="fas fa-file"></i> Nueva Tarjeta
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel de Vista Previa -->
+            <div class="card">
+                <div class="card-header no-print">
+                    <i class="fas fa-eye"></i>
+                    <h2>Vista Previa de la Tarjeta</h2>
+                </div>
+                <div class="card-body">
+                    <div class="preview-card" id="printable-tarjeta">
+                        <div class="preview-header">
+                            <h2>TARJETA DE TRABAJO - COBRERÍA DE MONTAJE</h2>
+                            <p>documento técnico generado por el COP de Alistamiento Buques Mercantes</p>
+                        </div>
+                        
+                        <div class="preview-grid">
+                            <div class="preview-column">
+                                <div class="preview-item">
+                                    <div class="preview-label">Taller:</div>
+                                    <div class="preview-value" id="prev-taller">Cobrería</div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">N° Tarjeta:</div>
+                                    <div class="preview-value" id="prev-numero">CB-0001</div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Fecha Emisión:</div>
+                                    <div class="preview-value" id="prev-fecha"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Fecha Necesidad:</div>
+                                    <div class="preview-value" id="prev-fecha-necesidad"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Título:</div>
+                                    <div class="preview-value" id="prev-titulo"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">N° Plano:</div>
+                                    <div class="preview-value" id="prev-plano"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Zona de Montaje:</div>
+                                    <div class="preview-value" id="prev-zona-montaje"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="preview-column">
+                                <div class="preview-item">
+                                    <div class="preview-label">N° Obra:</div>
+                                    <div class="preview-value" id="prev-obra"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Plan de Obras:</div>
+                                    <div class="preview-value" id="prev-plan-obra"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Medio Solicitud:</div>
+                                    <div class="preview-value" id="prev-medio">Informal</div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Sector Solicitante:</div>
+                                    <div class="preview-value" id="prev-sector"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Solicita:</div>
+                                    <div class="preview-value" id="prev-solicitante"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Horas Estimadas:</div>
+                                    <div class="preview-value" id="prev-horas"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">Material en Vales:</div>
+                                    <div class="preview-value" id="prev-material-vales"></div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-label">N° Inspección Calidad:</div>
+                                    <div class="preview-value" id="prev-inspeccion">Por completar</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-table-container">
+                            <table class="preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>N°</th>
+                                        <th>N° de Tubería</th>
+                                        <th>Ubicación</th>
+                                        <th>DN</th>
+                                        <th>kg</th>
+                                        <th>Espesor</th>
+                                        <th>Burlonería</th>
+                                        <th>Juntas</th>
+                                        <th>Terminado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="prev-tareas">
+                                    <tr>
+                                        <td colspan="9" style="text-align: center; padding: 20px; color: #7f8c8d;">
+                                            No se han definido ítems
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Sección de Responsable Destacada -->
+                        <div class="responsable-section">
+                            <h3><i class="fas fa-user-tie"></i> Responsable del Trabajo</h3>
+                            <div class="responsable-info">
+                                <div class="responsable-details">
+                                    <div class="preview-item">
+                                        <div class="preview-label">Nombre:</div>
+                                        <div class="preview-value" id="prev-responsable"></div>
+                                    </div>
+                                    <div class="preview-item">
+                                        <div class="preview-label">Cargo:</div>
+                                        <div class="preview-value" id="prev-cargo"></div>
+                                    </div>
+                                    <div class="preview-item">
+                                        <div class="preview-label">Contacto:</div>
+                                        <div class="preview-value" id="prev-contacto-resp"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="signature-area">
+                                <div class="signature-line"></div>
+                                <div class="signature-label">Firma del Responsable</div>
+                            </div>
+                        </div>
+                        
+                        <div class="distribution-list">
+                            <h4><i class="fas fa-envelope-open-text"></i> Distribución</h4>
+                            <div class="distribution-emails" id="prev-distribucion">
+                                Ingrese lista de distribución
+                            </div>
+                        </div>
+                        
+                        <div class="footer-contact" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--medium-gray);">
+                            <div class="preview-item">
+                                <div class="preview-label">Contacto COP:</div>
+                                <div class="preview-value" id="prev-contacto">C.O.P Buques mercantes - Gerencia de producción - INT: 7261 - Mail: copalist@astillero.gba.gov.ar</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="no-print" style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+                        <button class="btn btn-print" id="btnPrint">
+                            <i class="fas fa-print"></i> Imprimir Tarjeta
+                        </button>
+                        <button class="btn btn-export" id="btnExportPDF">
+                            <i class="fas fa-file-pdf"></i> Exportar a PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer Global -->
+        <div class="global-footer no-print">
+            <p>Sistema de Tarjetas de Trabajo &copy; 2025 | Astillero Río Santiago - Taller de Cobrería</p>
+        </div>
+    </div>
+    
+    <!-- Modal para Agregar/Editar Ítems -->
+    <div class="modal" id="itemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Agregar Nuevo Ítem</h3>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <form id="itemForm">
+                <div class="modal-form">
+                    <div class="form-group">
+                        <label class="required" for="itemNumber"><i class="fas fa-hashtag"></i> N° de Ítem</label>
+                        <input type="text" id="itemNumber" class="form-control" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required" for="itemCodigo"><i class="fas fa-tag"></i> N° de Tubería</label>
+                        <input type="text" id="itemCodigo" class="form-control" placeholder="Código o nombre de la tubería" required>
+                    </div>
+                    
+                    <div class="form-group form-group-full">
+                        <label class="required" for="itemDescripcion"><i class="fas fa-map-marker-alt"></i> Ubicación</label>
+                        <textarea id="itemDescripcion" class="form-control" rows="3" placeholder="Ubicación detallada del ítem" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemDN"><i class="fas fa-ruler"></i> DN (Diámetro Nominal)</label>
+                        <input type="number" id="itemDN" class="form-control" placeholder="Diámetro nominal en mm">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemPeso"><i class="fas fa-weight-hanging"></i> kg (Peso)</label>
+                        <input type="number" id="itemPeso" class="form-control" placeholder="Peso en kilogramos">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemEspesor"><i class="fas fa-ruler-vertical"></i> Espesor</label>
+                        <input type="text" id="itemEspesor" class="form-control" placeholder="Espesor (ej: 3mm)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemBurloneria"><i class="fas fa-cogs"></i> Burlonería</label>
+                        <input type="text" id="itemBurloneria" class="form-control" placeholder="Letras y números">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemJuntas"><i class="fas fa-ring"></i> Juntas</label>
+                        <input type="text" id="itemJuntas" class="form-control" placeholder="Letras y números">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemTerminado"><i class="fas fa-check-circle"></i> Terminado</label>
+                        <input type="text" id="itemTerminado" class="form-control" placeholder="Estado terminado">
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancel">Cancelar</button>
+                    <button type="submit" class="btn" id="btnSaveItem">Guardar Ítem</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <script>
-        // Inicializar variables
-        let registros = [];
-        let editIndex = -1;
-        let currentPage = 1;
-        const recordsPerPage = 10;
-        let currentSort = { field: 'obra', direction: 'asc' };
+        // El código JavaScript ha sido modificado para reflejar los cambios en el formulario y la vista previa.
         
-        const tablaBody = document.querySelector("#table-body");
-        const form = document.getElementById("form-registro");
-        const emptyState = document.getElementById("empty-state");
-        const searchInput = document.getElementById("search-input");
-        const obraFilter = document.getElementById("obra-filter");
-        const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
-        let copiasChart = null;
-        
-        // Paleta de colores fijos para cada taller (incluyendo COP)
-        const coloresTalleres = {
-            'Cobrería (Cob)': 'rgba(54, 162, 235, 0.7)',
-            'Trat. Superf. (TS)': 'rgba(75, 192, 192, 0.7)',
-            'Electromec. (Elec)': 'rgba(153, 102, 255, 0.7)',
-            'Carpintería (Carp)': 'rgba(255, 159, 64, 0.7)',
-            'Chapa Fina (CF)': 'rgba(255, 99, 132, 0.7)',
-            'Mat. Comp. (MC)': 'rgba(201, 203, 207, 0.7)',
-            'COP': 'rgba(220, 53, 69, 0.7)' // Color rojo para COP
-        };
-        
-        // Inicializar la fecha con la fecha actual
-        document.getElementById('fecha').valueAsDate = new Date();
-        
-        // Cargar registros desde localStorage al inicio
-        function cargarRegistros() {
-            const savedRegistros = localStorage.getItem('cop_registros');
-            if (savedRegistros) {
-                registros = JSON.parse(savedRegistros);
-                // Ordenar por obra y luego por número de plano
-                sortRegistros('obra');
-                actualizarTabla();
-                actualizarEstadisticas();
-                actualizarTarjetasRelacionadas();
-                actualizarResumenTalleres();
-                actualizarFiltros();
-                
-                if (registros.length > 0) {
-                    emptyState.style.display = 'none';
+        // Inicialización de la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar fechas
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fechaEmision').value = today;
+            document.getElementById('fechaNecesidad').value = today;
+            
+            // Evento para actualizar vista previa
+            document.getElementById('btnGenerar').addEventListener('click', updatePreview);
+            
+            // Evento para imprimir
+            document.getElementById('btnPrint').addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Evento para exportar a PDF
+            document.getElementById('btnExportPDF').addEventListener('click', exportarAPDF);
+            
+            // Eventos para el modal de ítems
+            document.getElementById('btnAddItem').addEventListener('click', openAddItemModal);
+            document.getElementById('closeModal').addEventListener('click', closeItemModal);
+            document.getElementById('btnCancel').addEventListener('click', closeItemModal);
+            document.getElementById('itemForm').addEventListener('submit', saveItem);
+            
+            // Evento para eliminar todos los ítems
+            document.getElementById('btnDeleteAll').addEventListener('click', function() {
+                if (confirm("¿Está seguro que desea eliminar TODOS los ítems?")) {
+                    items = [];
+                    renderItems();
+                    updatePreview();
                 }
-            }
-        }
-        
-        // Guardar registros en localStorage
-        function guardarRegistros() {
-            localStorage.setItem('cop_registros', JSON.stringify(registros));
-        }
-        
-        // Mostrar notificación
-        function mostrarNotificacion(mensaje, tipo = 'success') {
-            const notification = document.getElementById('notification');
-            const message = document.getElementById('notification-message');
+            });
             
-            notification.className = 'notification ' + tipo;
-            message.textContent = mensaje;
-            notification.classList.add('show');
+            // Evento para guardar tarjeta
+            document.getElementById('btnGuardar').addEventListener('click', guardarTarjeta);
             
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-        
-        // Evento submit del formulario
-        form.addEventListener("submit", e => {
-            e.preventDefault();
+            // Evento para nueva tarjeta
+            document.getElementById('btnNuevaTarjeta').addEventListener('click', nuevaTarjeta);
             
-            const obra = document.getElementById("obra").value;
-            const codigo = document.getElementById("codigo").value;
-            const titulo = document.getElementById("titulo").value;
-            const revision = document.getElementById("revision").value;
-            const fecha = document.getElementById("fecha").value;
-            const tipoIngreso = document.getElementById("tipo-ingreso").value;
-            const descripcion = document.getElementById("descripcion").value;
-            const planos = document.getElementById("planos").value;
-            const tarjetasTrabajo = document.getElementById("tarjetas-trabajo").value;
+            // Evento para buscar tarjetas
+            document.getElementById('btnBuscar').addEventListener('click', buscarTarjetas);
             
-            const copias = {
-                tallerA: parseInt(document.getElementById("taller-a").value) || 0,
-                tallerB: parseInt(document.getElementById("taller-b").value) || 0,
-                tallerC: parseInt(document.getElementById("taller-c").value) || 0,
-                tallerD: parseInt(document.getElementById("taller-d").value) || 0,
-                tallerE: parseInt(document.getElementById("taller-e").value) || 0,
-                tallerF: parseInt(document.getElementById("taller-f").value) || 0,
-                tallerG: parseInt(document.getElementById("taller-g").value) || 0 // Nuevo taller COP
-            };
+            // Eventos para guardar templates
+            document.getElementById('btnSaveObra').addEventListener('click', guardarObra);
+            document.getElementById('btnSaveResponsable').addEventListener('click', guardarResponsable);
+            document.getElementById('btnSaveDistribucion').addEventListener('click', guardarDistribucion);
             
-            const totalCopias = Object.values(copias).reduce((a, b) => a + b, 0);
+            // Cargar datos guardados
+            cargarDatosGuardados();
             
-            if (editIndex === -1) {
-                // Verificar si ya existe el mismo plano en la misma obra con la misma revisión
-                const existeMismaRevision = registros.some(r => 
-                    r.obra === obra && 
-                    r.codigo === codigo && 
-                    r.revision === revision
-                );
-                
-                if (existeMismaRevision) {
-                    mostrarNotificacion('Ya existe un documento con esta obra, número de plano y revisión', 'error');
-                    return;
-                }
-                
-                const registro = { 
-                    obra,
-                    codigo, 
-                    titulo, 
-                    revision, 
-                    fecha,
-                    tipoIngreso,
-                    descripcion: descripcion || "Sin descripción",
-                    planos: planos || "No especificados",
-                    tarjetasTrabajo: tarjetasTrabajo || "No especificadas",
-                    copias,
-                    totalCopias
-                };
-                
-                registros.push(registro);
-                mostrarNotificacion('Documento agregado correctamente');
-            } else {
-                // Actualizar registro existente
-                registros[editIndex] = { 
-                    obra,
-                    codigo, 
-                    titulo, 
-                    revision, 
-                    fecha,
-                    tipoIngreso,
-                    descripcion: descripcion || "Sin descripción",
-                    planos: planos || "No especificados",
-                    tarjetasTrabajo: tarjetasTrabajo || "No especificadas",
-                    copias,
-                    totalCopias
-                };
-                
-                mostrarNotificacion('Documento actualizado correctamente');
-                cancelEdit();
-            }
-            
-            guardarRegistros();
-            // Ordenar por obra y luego por número de plano
-            sortRegistros('obra');
-            actualizarTabla();
-            actualizarEstadisticas();
-            actualizarTarjetasRelacionadas();
-            actualizarResumenTalleres();
-            actualizarFiltros();
-            form.reset();
-            document.getElementById('fecha').valueAsDate = new Date();
-            
-            // Ocultar estado vacío
-            emptyState.style.display = 'none';
+            // Actualizar vista previa inicial
+            updatePreview();
         });
         
-        // Función para agregar fila a la tabla
-        function agregarFilaTabla(r, index) {
-            const fila = document.createElement("tr");
+        let items = [];
+        let obrasGuardadas = [];
+        let responsablesGuardados = [];
+        let listasDistribucion = [];
+        let editingItemId = null;
+        let consecutivoTarjeta = 1;
+        let tarjetasGuardadas = [];
+        let editingTarjetaId = null;
+        
+        function cargarDatosGuardados() {
+            const consecutivoGuardado = localStorage.getItem('consecutivoTarjeta');
+            if (consecutivoGuardado) {
+                consecutivoTarjeta = parseInt(consecutivoGuardado);
+            }
+            document.getElementById('numeroTarjeta').value = `CB-${consecutivoTarjeta.toString().padStart(4, '0')}`;
             
-            // Determinar clase CSS según tipo de ingreso
-            let tipoIngresoClass = "";
-            let tipoIngresoText = r.tipoIngreso;
-            if (r.tipoIngreso === "Copia Papel") {
-                tipoIngresoClass = "badge-papel";
-            } else if (r.tipoIngreso === "Digital") {
-                tipoIngresoClass = "badge-digital";
-            } else if (r.tipoIngreso === "Ambas") {
-                tipoIngresoClass = "badge-ambas";
+            const tarjetasGuardadasStr = localStorage.getItem('tarjetasGuardadas');
+            if (tarjetasGuardadasStr) {
+                tarjetasGuardadas = JSON.parse(tarjetasGuardadasStr);
             }
             
-            // Formatear tarjetas de trabajo como badges
-            let tarjetasHTML = "No especificadas";
-            if (r.tarjetasTrabajo && r.tarjetasTrabajo !== "No especificadas") {
-                const tarjetas = r.tarjetasTrabajo.split(',').map(t => t.trim());
-                tarjetasHTML = tarjetas.map(t => `<span class="tarjeta-badge">${t}</span>`).join('');
+            const obrasStr = localStorage.getItem('obrasGuardadas');
+            if (obrasStr) {
+                obrasGuardadas = JSON.parse(obrasStr);
+                actualizarSelectObras();
             }
             
-            fila.innerHTML = `
-                <td>${r.obra}</td>
-                <td>${r.codigo}</td>
-                <td>${r.titulo}</td>
-                <td>${r.revision}</td>
-                <td>${formatDate(r.fecha)}</td>
-                <td><span class="tipo-ingreso-badge ${tipoIngresoClass}">${tipoIngresoText}</span></td>
-                <td class="description-cell">${r.descripcion}</td>
-                <td>${r.planos}</td>
-                <td>${tarjetasHTML}</td>
-                <td class="text-center fw-bold">${r.totalCopias}</td>
-                <td>
-                    <button class="btn btn-sm btn-info me-1" onclick="verDetalles('${r.codigo}', '${r.obra}')">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-warning me-1" onclick="editarRegistro(${index})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="eliminarRegistro(${index})">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            `;
-            tablaBody.appendChild(fila);
+            const responsablesStr = localStorage.getItem('responsablesGuardados');
+            if (responsablesStr) {
+                responsablesGuardados = JSON.parse(responsablesStr);
+                actualizarSelectResponsables();
+            }
+            
+            const distribucionStr = localStorage.getItem('listasDistribucion');
+            if (distribucionStr) {
+                listasDistribucion = JSON.parse(distribucionStr);
+                actualizarSelectDistribucion();
+            }
         }
         
-        // Función para formatear fecha
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
+        function actualizarSelect(selectId, data, valueField, textField, dataAttributes = {}) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = `<option value="">Seleccionar ${selectId.replace('Guardadas', '').toLowerCase()}...</option>`;
+            
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item[valueField];
+                option.textContent = typeof textField === 'function' ? textField(item) : item[textField];
+                Object.keys(dataAttributes).forEach(key => {
+                    option.dataset[key] = item[dataAttributes[key]];
+                });
+                select.appendChild(option);
+            });
+        }
+
+        function actualizarSelectObras() {
+            actualizarSelect('obrasGuardadas', obrasGuardadas, 'codigo', item => item.descripcion ? `${item.codigo} - ${item.descripcion}` : item.codigo, { descripcion: 'descripcion', plan: 'plan' });
+        }
+
+        function actualizarSelectResponsables() {
+            actualizarSelect('responsablesGuardados', responsablesGuardados, 'nombre', item => `${item.nombre} - ${item.cargo}`, { cargo: 'cargo', contacto: 'contacto' });
+        }
+
+        function actualizarSelectDistribucion() {
+            actualizarSelect('listasDistribucionGuardadas', listasDistribucion, 'nombre', 'nombre', { emails: 'emails' });
+        }
+        
+        function guardarObra() {
+            const codigo = document.getElementById('obraCodigo').value.trim();
+            const descripcion = document.getElementById('obraDescripcion').value.trim();
+            const plan = document.getElementById('planObras').value.trim();
+            
+            if (!codigo) {
+                alert('El código de obra es obligatorio');
+                return;
+            }
+            
+            if (obrasGuardadas.some(obra => obra.codigo === codigo)) {
+                alert('Ya existe una obra con este código');
+                return;
+            }
+            
+            obrasGuardadas.push({ codigo, descripcion, plan });
+            localStorage.setItem('obrasGuardadas', JSON.stringify(obrasGuardadas));
+            actualizarSelectObras();
+            alert('Obra guardada correctamente');
+        }
+        
+        function seleccionarObra(select) {
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('obraCodigo').value = selectedOption.value;
+                document.getElementById('obraDescripcion').value = selectedOption.dataset.descripcion || '';
+                document.getElementById('planObras').value = selectedOption.dataset.plan || '';
+            }
+        }
+        
+        function guardarResponsable() {
+            const nombre = document.getElementById('responsableNombre').value.trim();
+            const cargo = document.getElementById('responsableCargo').value.trim();
+            const contacto = document.getElementById('contactoResponsable').value.trim();
+            
+            if (!nombre || !cargo || !contacto) {
+                alert('Todos los campos de responsable son obligatorios');
+                return;
+            }
+            
+            if (responsablesGuardados.some(resp => resp.nombre === nombre && resp.cargo === cargo)) {
+                alert('Este responsable ya está guardado');
+                return;
+            }
+            
+            responsablesGuardados.push({ nombre, cargo, contacto });
+            localStorage.setItem('responsablesGuardados', JSON.stringify(responsablesGuardados));
+            actualizarSelectResponsables();
+            alert('Responsable guardado correctamente');
+        }
+        
+        function seleccionarResponsable(select) {
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('responsableNombre').value = selectedOption.value;
+                document.getElementById('responsableCargo').value = selectedOption.dataset.cargo || '';
+                document.getElementById('contactoResponsable').value = selectedOption.dataset.contacto || '';
+            }
+        }
+        
+        function guardarDistribucion() {
+            alert("La función de guardar listas de distribución está deshabilitada por política de la empresa.");
+        }
+        
+        function seleccionarListaDistribucion(select) {
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('listaDistribucion').value = selectedOption.dataset.emails || '';
+                document.getElementById('nombreListaDistribucion').value = selectedOption.value;
+            }
+        }
+        
+        function openAddItemModal() {
+            document.getElementById('modalTitle').textContent = "Agregar Nuevo Ítem";
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemNumber').value = (items.length + 1).toString();
+            editingItemId = null;
+            document.getElementById('itemModal').style.display = "flex";
+        }
+        
+        function editItem(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            
+            document.getElementById('modalTitle').textContent = "Editar Ítem";
+            document.getElementById('itemNumber').value = item.number;
+            document.getElementById('itemCodigo').value = item.codigo;
+            document.getElementById('itemDescripcion').value = item.descripcion;
+            document.getElementById('itemDN').value = item.dn;
+            document.getElementById('itemPeso').value = item.peso;
+            document.getElementById('itemEspesor').value = item.espesor;
+            document.getElementById('itemBurloneria').value = item.burloneria;
+            document.getElementById('itemJuntas').value = item.juntas;
+            document.getElementById('itemTerminado').value = item.terminado;
+            
+            editingItemId = id;
+            document.getElementById('itemModal').style.display = "flex";
+        }
+        
+        function closeItemModal() {
+            document.getElementById('itemModal').style.display = "none";
+        }
+        
+        function saveItem(e) {
+            e.preventDefault();
+            
+            if (!document.getElementById('itemCodigo').value || !document.getElementById('itemDescripcion').value) {
+                alert("Los campos 'N° de Tubería' y 'Ubicación' son obligatorios");
+                return;
+            }
+            
+            const item = {
+                id: editingItemId || Date.now(),
+                number: document.getElementById('itemNumber').value,
+                codigo: document.getElementById('itemCodigo').value,
+                descripcion: document.getElementById('itemDescripcion').value,
+                dn: document.getElementById('itemDN').value || "-",
+                peso: document.getElementById('itemPeso').value || "-",
+                espesor: document.getElementById('itemEspesor').value || "-",
+                burloneria: document.getElementById('itemBurloneria').value || "-",
+                juntas: document.getElementById('itemJuntas').value || "-",
+                terminado: document.getElementById('itemTerminado').value || "-"
+            };
+            
+            if (editingItemId) {
+                const index = items.findIndex(i => i.id === editingItemId);
+                if (index !== -1) items[index] = item;
+            } else {
+                items.push(item);
+            }
+            
+            renderItems();
+            updatePreview();
+            closeItemModal();
+        }
+        
+        function removeItem(id) {
+            if (confirm("¿Está seguro que desea eliminar este ítem?")) {
+                items = items.filter(item => item.id !== id);
+                renderItems();
+                updatePreview();
+            }
+        }
+        
+        function renderItems() {
+            const container = document.getElementById('tasksContainer');
+            if (items.length === 0) {
+                container.innerHTML = `<tr><td colspan="10" class="no-tasks">No se han agregado ítems</td></tr>`;
+                return;
+            }
+            
+            container.innerHTML = '';
+            items.forEach(item => {
+                const itemRow = document.createElement('tr');
+                itemRow.innerHTML = `
+                    <td>${item.number}</td>
+                    <td>${item.codigo}</td>
+                    <td>${item.descripcion}</td>
+                    <td>${item.dn}</td>
+                    <td>${item.peso}</td>
+                    <td>${item.espesor}</td>
+                    <td>${item.burloneria}</td>
+                    <td>${item.juntas}</td>
+                    <td>${item.terminado}</td>
+                    <td class="task-actions">
+                        <button class="btn btn-edit" onclick="editItem(${item.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-remove" onclick="removeItem(${item.id})"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+                container.appendChild(itemRow);
             });
         }
         
-        // Función para exportar a Excel
-        function exportarExcel() {
-            if (registros.length === 0) {
-                mostrarNotificacion("No hay registros para exportar", "error");
-                return;
-            }
+        function updatePreview() {
+            const formatDate = (dateString) => {
+                if (!dateString) return "";
+                const date = new Date(dateString + 'T00:00:00'); // Asegurar que se interprete como local
+                return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            };
+
+            document.getElementById('prev-numero').textContent = document.getElementById('numeroTarjeta').value;
+            document.getElementById('prev-fecha').textContent = formatDate(document.getElementById('fechaEmision').value);
+            document.getElementById('prev-fecha-necesidad').textContent = formatDate(document.getElementById('fechaNecesidad').value);
+            document.getElementById('prev-titulo').textContent = document.getElementById('tituloTarjeta').value || '---';
+            document.getElementById('prev-plano').textContent = document.getElementById('numeroPlano').value || '---';
+            const obraCodigo = document.getElementById('obraCodigo').value || '';
+            const obraDesc = document.getElementById('obraDescripcion').value || '';
+            document.getElementById('prev-obra').textContent = obraDesc ? `${obraCodigo} - ${obraDesc}` : obraCodigo || '---';
+            document.getElementById('prev-plan-obra').textContent = document.getElementById('planObras').value || '---';
+            document.getElementById('prev-inspeccion').textContent = document.getElementById('inspeccionCalidad').value || 'Por completar';
+            document.getElementById('prev-medio').textContent = document.getElementById('medioSolicitud').value;
+            document.getElementById('prev-sector').textContent = document.getElementById('sectorSolicitante').value || '---';
+            document.getElementById('prev-solicitante').textContent = document.getElementById('solicitante').value || '---';
+            document.getElementById('prev-zona-montaje').textContent = document.getElementById('zonaMontaje').value || '---';
+            document.getElementById('prev-horas').textContent = document.getElementById('horasEstimadas').value || '---';
+            document.getElementById('prev-material-vales').textContent = document.getElementById('materialVales').value || '---';
+            document.getElementById('prev-responsable').textContent = document.getElementById('responsableNombre').value || '---';
+            document.getElementById('prev-cargo').textContent = document.getElementById('responsableCargo').value || '---';
+            document.getElementById('prev-contacto-resp').textContent = document.getElementById('contactoResponsable').value || '---';
+            document.getElementById('prev-distribucion').textContent = document.getElementById('listaDistribucion').value || 'No especificada';
             
-            try {
-                const data = registros.map(r => ({
-                    'Obra': r.obra,
-                    'Número de Plano': r.codigo,
-                    'Título': r.titulo,
-                    'Revisión': r.revision,
-                    'Fecha': formatDate(r.fecha),
-                    'Tipo de Ingreso': r.tipoIngreso,
-                    'Descripción': r.descripcion,
-                    'Planos Relacionados': r.planos,
-                    'Tarjetas de Trabajo': r.tarjetasTrabajo,
-                    'Copias Totales': r.totalCopias,
-                    'Cobrería (Cob)': r.copias.tallerA,
-                    'Trat. Superf. (TS)': r.copias.tallerB,
-                    'Electromec. (Elec)': r.copias.tallerC,
-                    'Carpintería (Carp)': r.copias.tallerD,
-                    'Chapa Fina (CF)': r.copias.tallerE,
-                    'Mat. Comp. (MC)': r.copias.tallerF,
-                    'COP': r.copias.tallerG
-                }));
-                
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.json_to_sheet(data);
-                XLSX.utils.book_append_sheet(wb, ws, "Registros COP");
-                XLSX.writeFile(wb, "registro_cop_buques.xlsx");
-                mostrarNotificacion('Exportación a Excel completada');
-            } catch (error) {
-                mostrarNotificacion("Error al exportar a Excel: " + error.message, "error");
-            }
+            updateItemsPreview();
         }
         
-        // Función para guardar como PDF (adaptada para múltiples páginas y A4)
-        function guardarPDF() {
-            if (registros.length === 0) {
-                mostrarNotificacion("No hay registros para exportar", "error");
+        function updateItemsPreview() {
+            const tbody = document.getElementById('prev-tareas');
+            tbody.innerHTML = '';
+            
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 20px; color: #7f8c8d;">No se han definido ítems</td></tr>`;
                 return;
             }
             
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-                
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-                const margin = 15;
-                
-                // Título
-                doc.setFontSize(18);
-                doc.setFont(undefined, 'bold');
-                doc.text('Registro COP - Buques Mercantes', pageWidth / 2, margin, { align: 'center' });
-                
-                // Fecha
-                doc.setFontSize(11);
-                doc.setFont(undefined, 'normal');
-                doc.text('Reporte generado el: ' + new Date().toLocaleDateString(), pageWidth / 2, margin + 10, { align: 'center' });
-                
-                // Preparar datos para la tabla
-                const headers = [
-                    'Obra',
-                    'Número Plano',
-                    'Título',
-                    'Revisión',
-                    'Fecha',
-                    'Tipo',
-                    'Copias Totales'
-                ];
-                
-                const data = registros.map(r => [
-                    r.obra,
-                    r.codigo,
-                    r.titulo,
-                    r.revision,
-                    formatDate(r.fecha),
-                    r.tipoIngreso,
-                    r.totalCopias
-                ]);
-                
-                // Configuración de autoTable
-                doc.autoTable({
-                    startY: margin + 15,
-                    head: [headers],
-                    body: data,
-                    margin: { top: margin + 15 },
-                    styles: {
-                        fontSize: 9,
-                        cellPadding: 2,
-                        overflow: 'linebreak'
-                    },
-                    headStyles: {
-                        fillColor: [26, 58, 95],
-                        textColor: [255, 255, 255],
-                        fontStyle: 'bold'
-                    },
-                    alternateRowStyles: {
-                        fillColor: [240, 240, 240]
-                    },
-                    columnStyles: {
-                        0: { cellWidth: 20 },
-                        1: { cellWidth: 30 },
-                        2: { cellWidth: 50 },
-                        3: { cellWidth: 15 },
-                        4: { cellWidth: 20 },
-                        5: { cellWidth: 25 },
-                        6: { cellWidth: 20 }
-                    },
-                    tableWidth: 'auto',
-                    pageBreak: 'auto',
-                    theme: 'grid'
-                });
-                
-                // Pie de página
-                const pageCount = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(10);
-                    doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-                }
-                
-                doc.save('registro_cop_buques.pdf');
-                mostrarNotificacion('PDF generado correctamente');
-            } catch (error) {
-                mostrarNotificacion("Error al generar PDF: " + error.message, "error");
-            }
-        }
-        
-        // Función para imprimir todos los registros (sin paginación)
-        function imprimirTabla() {
-            if (registros.length === 0) {
-                mostrarNotificacion("No hay registros para imprimir", "error");
-                return;
-            }
-            
-            // Actualizar la fecha en el encabezado
-            document.getElementById('print-date').textContent = new Date().toLocaleDateString();
-            document.getElementById('print-footer-date').textContent = new Date().toLocaleDateString();
-            
-            // Crear tabla para impresión
-            const printContainer = document.getElementById('print-table-container');
-            printContainer.innerHTML = '';
-            
-            const table = document.createElement('table');
-            table.className = 'table table-bordered';
-            table.style.width = '100%';
-            table.style.fontSize = '10pt';
-            
-            // Crear encabezados
-            const thead = document.createElement('thead');
-            thead.innerHTML = `
-                <tr>
-                    <th>Obra</th>
-                    <th>Número Plano</th>
-                    <th>Título</th>
-                    <th>Revisión</th>
-                    <th>Fecha</th>
-                    <th>Tipo Ingreso</th>
-                    <th>Copias Totales</th>
-                </tr>
-            `;
-            table.appendChild(thead);
-            
-            // Crear cuerpo de la tabla con todos los registros
-            const tbody = document.createElement('tbody');
-            registros.forEach(r => {
+            items.forEach(item => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${r.obra}</td>
-                    <td>${r.codigo}</td>
-                    <td>${r.titulo}</td>
-                    <td>${r.revision}</td>
-                    <td>${formatDate(r.fecha)}</td>
-                    <td>${r.tipoIngreso}</td>
-                    <td>${r.totalCopias}</td>
+                    <td>${item.number}</td>
+                    <td>${item.codigo}</td>
+                    <td>${item.descripcion}</td>
+                    <td>${item.dn}</td>
+                    <td>${item.peso}</td>
+                    <td>${item.espesor}</td>
+                    <td>${item.burloneria}</td>
+                    <td>${item.juntas}</td>
+                    <td>${item.terminado}</td>
                 `;
                 tbody.appendChild(row);
             });
-            table.appendChild(tbody);
-            
-            printContainer.appendChild(table);
-            
-            // Mostrar la sección de impresión y ocultar el resto
-            document.querySelector('.print-section').style.display = 'block';
-            
-            // Imprimir
-            window.print();
-            
-            // Ocultar la sección de impresión después de imprimir
-            setTimeout(() => {
-                document.querySelector('.print-section').style.display = 'none';
-            }, 500);
         }
         
-        // Función para eliminar un registro
-        function eliminarRegistro(index) {
-            if (confirm("¿Está seguro de eliminar este registro?")) {
-                registros.splice(index, 1);
-                guardarRegistros();
-                actualizarTabla();
-                actualizarEstadisticas();
-                actualizarTarjetasRelacionadas();
-                actualizarResumenTalleres();
-                actualizarFiltros();
-                mostrarNotificacion('Documento eliminado correctamente');
-                
-                if (registros.length === 0) {
-                    emptyState.style.display = 'block';
-                }
-            }
-        }
-        
-        // Función para editar un registro
-        function editarRegistro(index) {
-            const r = registros[index];
-            document.getElementById("obra").value = r.obra;
-            document.getElementById("codigo").value = r.codigo;
-            document.getElementById("titulo").value = r.titulo;
-            document.getElementById("revision").value = r.revision;
-            document.getElementById("fecha").value = r.fecha;
-            document.getElementById("tipo-ingreso").value = r.tipoIngreso;
-            document.getElementById("descripcion").value = r.descripcion;
-            document.getElementById("planos").value = r.planos;
-            document.getElementById("tarjetas-trabajo").value = r.tarjetasTrabajo;
-            document.getElementById("taller-a").value = r.copias.tallerA;
-            document.getElementById("taller-b").value = r.copias.tallerB;
-            document.getElementById("taller-c").value = r.copias.tallerC;
-            document.getElementById("taller-d").value = r.copias.tallerD;
-            document.getElementById("taller-e").value = r.copias.tallerE;
-            document.getElementById("taller-f").value = r.copias.tallerF;
-            document.getElementById("taller-g").value = r.copias.tallerG;
-            
-            // Cambiar el botón
-            document.getElementById("submit-btn").innerHTML = '<i class="fas fa-sync-alt me-2"></i>Actualizar Documento';
-            document.getElementById("form-title").textContent = "Editar Documento";
-            document.getElementById("cancel-edit-btn").style.display = 'block';
-            
-            editIndex = index;
-            
-            // Scroll al formulario
-            document.getElementById('form-registro').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // Cancelar edición
-        function cancelEdit() {
-            form.reset();
-            document.getElementById('fecha').valueAsDate = new Date();
-            document.getElementById("submit-btn").innerHTML = '<i class="fas fa-plus-circle me-2"></i>Agregar Documento';
-            document.getElementById("form-title").textContent = "Registro de Documentación";
-            document.getElementById("cancel-edit-btn").style.display = 'none';
-            editIndex = -1;
-        }
-        
-        // Función para limpiar la tabla
-        function clearTable() {
-            if (registros.length === 0) return;
-            
-            if (confirm("¿Está seguro de eliminar todos los registros?")) {
-                registros = [];
-                guardarRegistros();
-                actualizarTabla();
-                actualizarEstadisticas();
-                actualizarTarjetasRelacionadas();
-                actualizarResumenTalleres();
-                actualizarFiltros();
-                emptyState.style.display = 'block';
-                mostrarNotificacion('Todos los registros han sido eliminados');
-            }
-        }
-        
-        // Función para actualizar estadísticas
-        function actualizarEstadisticas() {
-            document.getElementById('total-docs').textContent = registros.length;
-            document.getElementById('total-registros').textContent = registros.length;
-            
-            if (registros.length > 0) {
-                // Calcular copias en papel
-                const copiasPapel = registros.reduce((acc, curr) => {
-                    if (curr.tipoIngreso === 'Copia Papel' || curr.tipoIngreso === 'Ambas') {
-                        return acc + curr.totalCopias;
-                    }
-                    return acc;
-                }, 0);
-                document.getElementById('copias-papel').textContent = copiasPapel;
-                
-                // Calcular copias digitales
-                const copiasDigital = registros.reduce((acc, curr) => {
-                    if (curr.tipoIngreso === 'Digital' || curr.tipoIngreso === 'Ambas') {
-                        return acc + 1;
-                    }
-                    return acc;
-                }, 0);
-                document.getElementById('copias-digital').textContent = copiasDigital;
-                
-                // Obtener última fecha
-                const latestDate = registros.reduce((latest, curr) => 
-                    curr.fecha > latest ? curr.fecha : latest, registros[0].fecha);
-                document.getElementById('latest-date').textContent = formatDate(latestDate);
-                
-                // Total de copias físicas
-                const totalCopias = registros.reduce((acc, curr) => acc + curr.totalCopias, 0);
-                document.getElementById('total-copias').textContent = totalCopias;
-            } else {
-                document.getElementById('copias-papel').textContent = '0';
-                document.getElementById('copias-digital').textContent = '0';
-                document.getElementById('latest-date').textContent = '-';
-                document.getElementById('total-copias').textContent = '0';
-            }
-        }
-        
-        // Función para ver detalles de un registro
-        function verDetalles(codigo, obra) {
-            const registro = registros.find(r => r.codigo === codigo && r.obra === obra);
-            if (!registro) return;
-            
-            document.getElementById('detail-obra').textContent = registro.obra;
-            document.getElementById('detail-codigo').textContent = registro.codigo;
-            document.getElementById('detail-titulo').textContent = registro.titulo;
-            document.getElementById('detail-revision').textContent = registro.revision;
-            document.getElementById('detail-fecha').textContent = formatDate(registro.fecha);
-            document.getElementById('detail-tipo-ingreso').textContent = registro.tipoIngreso;
-            document.getElementById('detail-descripcion').textContent = registro.descripcion;
-            document.getElementById('detail-planos').textContent = registro.planos;
-            document.getElementById('detail-copias').textContent = registro.totalCopias;
-            
-            // Formatear tarjetas de trabajo
-            let tarjetasHTML = "No especificadas";
-            if (registro.tarjetasTrabajo && registro.tarjetasTrabajo !== "No especificadas") {
-                const tarjetas = registro.tarjetasTrabajo.split(',').map(t => t.trim());
-                tarjetasHTML = tarjetas.map(t => `<span class="tarjeta-badge">${t}</span>`).join('');
-            }
-            document.getElementById('detail-tarjetas').innerHTML = tarjetasHTML;
-            
-            document.getElementById('detail-taller-a').textContent = registro.copias.tallerA;
-            document.getElementById('detail-taller-b').textContent = registro.copias.tallerB;
-            document.getElementById('detail-taller-c').textContent = registro.copias.tallerC;
-            document.getElementById('detail-taller-d').textContent = registro.copias.tallerD;
-            document.getElementById('detail-taller-e').textContent = registro.copias.tallerE;
-            document.getElementById('detail-taller-f').textContent = registro.copias.tallerF;
-            document.getElementById('detail-taller-g').textContent = registro.copias.tallerG;
-            
-            detailModal.show();
-        }
-        
-        // Función para actualizar tarjetas relacionadas
-        function actualizarTarjetasRelacionadas() {
-            // Documentos recientes
-            const recentList = document.getElementById('recent-docs');
-            recentList.innerHTML = '';
-            
-            if (registros.length === 0) {
-                recentList.innerHTML = '<li>No hay documentos recientes</li>';
-            } else {
-                const recentDocs = [...registros].reverse().slice(0, 5);
-                recentDocs.forEach(doc => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span class="fw-bold">${doc.codigo}</span> (${doc.obra}) - ${doc.titulo}`;
-                    recentList.appendChild(li);
-                });
-            }
-            
-            // Talleres con más copias
-            const topTalleresList = document.getElementById('top-talleres');
-            topTalleresList.innerHTML = '';
-            
-            if (registros.length === 0) {
-                topTalleresList.innerHTML = '<li>No hay datos disponibles</li>';
-            } else {
-                const talleres = {
-                    'Cobrería (Cob)': registros.reduce((sum, doc) => sum + doc.copias.tallerA, 0),
-                    'Trat. Superf. (TS)': registros.reduce((sum, doc) => sum + doc.copias.tallerB, 0),
-                    'Electromec. (Elec)': registros.reduce((sum, doc) => sum + doc.copias.tallerC, 0),
-                    'Carpintería (Carp)': registros.reduce((sum, doc) => sum + doc.copias.tallerD, 0),
-                    'Chapa Fina (CF)': registros.reduce((sum, doc) => sum + doc.copias.tallerE, 0),
-                    'Mat. Comp. (MC)': registros.reduce((sum, doc) => sum + doc.copias.tallerF, 0),
-                    'COP': registros.reduce((sum, doc) => sum + doc.copias.tallerG, 0)
-                };
-                
-                // Ordenar talleres por cantidad de copias
-                const sortedTalleres = Object.entries(talleres)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 3);
-                
-                sortedTalleres.forEach(([taller, copias]) => {
-                    if (copias > 0) {
-                        const li = document.createElement('li');
-                        li.innerHTML = `${taller}: <span class="fw-bold">${copias}</span> copias`;
-                        topTalleresList.appendChild(li);
-                    }
-                });
-                
-                if (topTalleresList.children.length === 0) {
-                    topTalleresList.innerHTML = '<li>No hay copias registradas</li>';
-                }
-            }
-            
-            // Actualizar gráfico de distribución
-            actualizarGraficoCopias();
-        }
-        
-        // Función para actualizar gráfico de copias con colores fijos
-        function actualizarGraficoCopias() {
-            const ctx = document.getElementById('copias-chart').getContext('2d');
-            
-            // Destruir gráfico existente si hay uno
-            if (copiasChart) {
-                copiasChart.destroy();
-            }
-            
-            if (registros.length === 0) {
-                return;
-            }
-            
-            const talleres = {
-                'Cobrería (Cob)': registros.reduce((sum, doc) => sum + doc.copias.tallerA, 0),
-                'Trat. Superf. (TS)': registros.reduce((sum, doc) => sum + doc.copias.tallerB, 0),
-                'Electromec. (Elec)': registros.reduce((sum, doc) => sum + doc.copias.tallerC, 0),
-                'Carpintería (Carp)': registros.reduce((sum, doc) => sum + doc.copias.tallerD, 0),
-                'Chapa Fina (CF)': registros.reduce((sum, doc) => sum + doc.copias.tallerE, 0),
-                'Mat. Comp. (MC)': registros.reduce((sum, doc) => sum + doc.copias.tallerF, 0),
-                'COP': registros.reduce((sum, doc) => sum + doc.copias.tallerG, 0)
-            };
-            
-            const labels = Object.keys(talleres);
-            const data = Object.values(talleres);
-            const total = data.reduce((a, b) => a + b, 0);
-            
-            if (total === 0) {
-                return;
-            }
-            
-            // Usar colores fijos para cada taller
-            const backgroundColors = labels.map(taller => coloresTalleres[taller]);
-            
-            copiasChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: backgroundColors,
-                        borderWidth: 1
-                    }]
+        function getFormData() {
+            return {
+                id: editingTarjetaId || Date.now(),
+                numero: document.getElementById('numeroTarjeta').value,
+                fechaEmision: document.getElementById('fechaEmision').value,
+                fechaNecesidad: document.getElementById('fechaNecesidad').value,
+                titulo: document.getElementById('tituloTarjeta').value,
+                plano: document.getElementById('numeroPlano').value,
+                obra: {
+                    codigo: document.getElementById('obraCodigo').value,
+                    descripcion: document.getElementById('obraDescripcion').value,
+                    plan: document.getElementById('planObras').value
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 15
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.raw;
-                                    const percentage = Math.round((value / total) * 100);
-                                    return `${context.label}: ${value} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+                inspeccion: document.getElementById('inspeccionCalidad').value,
+                medioSolicitud: document.getElementById('medioSolicitud').value,
+                sectorSolicitante: document.getElementById('sectorSolicitante').value,
+                solicitante: document.getElementById('solicitante').value,
+                zonaMontaje: document.getElementById('zonaMontaje').value,
+                horasEstimadas: document.getElementById('horasEstimadas').value,
+                materialVales: document.getElementById('materialVales').value,
+                responsable: {
+                    nombre: document.getElementById('responsableNombre').value,
+                    cargo: document.getElementById('responsableCargo').value,
+                    contacto: document.getElementById('contactoResponsable').value
+                },
+                listaDistribucion: document.getElementById('listaDistribucion').value,
+                items: [...items]
+            };
         }
-        
-        // Función para actualizar resumen de talleres
-        function actualizarResumenTalleres() {
-            if (registros.length === 0) {
-                document.getElementById('taller-a-total').textContent = '0';
-                document.getElementById('taller-b-total').textContent = '0';
-                document.getElementById('taller-c-total').textContent = '0';
-                document.getElementById('taller-d-total').textContent = '0';
-                document.getElementById('taller-e-total').textContent = '0';
-                document.getElementById('taller-f-total').textContent = '0';
-                document.getElementById('taller-g-total').textContent = '0';
+
+        function guardarTarjeta() {
+            const tarjeta = getFormData();
+            if (!tarjeta.titulo || !tarjeta.obra.codigo || !tarjeta.responsable.nombre || !tarjeta.listaDistribucion) {
+                alert('Por favor, complete todos los campos obligatorios.');
                 return;
             }
             
-            document.getElementById('taller-a-total').textContent = 
-                registros.reduce((sum, doc) => sum + doc.copias.tallerA, 0);
-                
-            document.getElementById('taller-b-total').textContent = 
-                registros.reduce((sum, doc) => sum + doc.copias.tallerB, 0);
-                
-            document.getElementById('taller-c-total').textContent = 
-                registros.reduce((sum, doc) => sum + doc.copias.tallerC, 0);
-                
-            document.getElementById('taller-d-total').textContent = 
-                registros.reduce((sum, doc) => sum + doc.copias.tallerD, 0);
-                
-            document.getElementById('taller-e-total').textContent = 
-                registros.reduce((sum, doc) => sum + doc.copias.tallerE, 0);
-                
-            document.getElementById('taller-f-total').textContent = 
-                registros.reduce((sum, doc) => sum + doc.copias.tallerF, 0);
-                
-            document.getElementById('taller-g-total').textContent = 
-                registros.reduce((sum, doc) => sum + doc.copias.tallerG, 0);
-        }
-        
-        // Función para actualizar filtros
-        function actualizarFiltros() {
-            const obrasList = document.getElementById('obras-list');
-            obrasList.innerHTML = '';
-            
-            // Obtener obras únicas
-            const obrasUnicas = [...new Set(registros.map(r => r.obra))];
-            
-            if (obrasUnicas.length === 0) {
-                obrasList.innerHTML = '<span class="text-muted">No hay obras registradas</span>';
-                return;
-            }
-            
-            obrasUnicas.forEach(obra => {
-                const badge = document.createElement('div');
-                badge.className = 'obra-badge';
-                badge.textContent = obra;
-                badge.onclick = function() {
-                    obraFilter.value = obra;
-                    filtrarRegistros();
-                };
-                obrasList.appendChild(badge);
-            });
-        }
-        
-        // Función para filtrar registros
-        function filtrarRegistros() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const obraSeleccionada = obraFilter.value;
-            
-            const rows = tablaBody.querySelectorAll('tr');
-            
-            rows.forEach(row => {
-                const obra = row.cells[0].textContent.toLowerCase();
-                const codigo = row.cells[1].textContent.toLowerCase();
-                const titulo = row.cells[2].textContent.toLowerCase();
-                
-                let mostrar = true;
-                
-                // Filtrar por obra
-                if (obraSeleccionada && obra !== obraSeleccionada.toLowerCase()) {
-                    mostrar = false;
-                }
-                
-                // Filtrar por búsqueda
-                if (mostrar && searchTerm) {
-                    // Buscar en obra, código y título
-                    if (!obra.includes(searchTerm) && !codigo.includes(searchTerm) && !titulo.includes(searchTerm)) {
-                        mostrar = false;
-                    }
-                }
-                
-                row.style.display = mostrar ? '' : 'none';
-            });
-            
-            // Destacar términos de búsqueda
-            if (searchTerm) {
-                const regex = new RegExp(searchTerm, 'gi');
-                rows.forEach(row => {
-                    if (row.style.display !== 'none') {
-                        const obraCell = row.cells[0];
-                        const codigoCell = row.cells[1];
-                        const tituloCell = row.cells[2];
-                        
-                        // Destacar en obra
-                        obraCell.innerHTML = obraCell.textContent.replace(
-                            regex, 
-                            match => `<span class="search-highlight">${match}</span>`
-                        );
-                        
-                        // Destacar en código
-                        codigoCell.innerHTML = codigoCell.textContent.replace(
-                            regex, 
-                            match => `<span class="search-highlight">${match}</span>`
-                        );
-                        
-                        // Destacar en título
-                        tituloCell.innerHTML = tituloCell.textContent.replace(
-                            regex, 
-                            match => `<span class="search-highlight">${match}</span>`
-                        );
-                    }
-                });
-            }
-        }
-        
-        // Función para limpiar filtros
-        function limpiarFiltros() {
-            searchInput.value = '';
-            obraFilter.value = '';
-            filtrarRegistros();
-            
-            // Restaurar el contenido original de las celdas
-            const rows = tablaBody.querySelectorAll('tr');
-            rows.forEach(row => {
-                const obraCell = row.cells[0];
-                const codigoCell = row.cells[1];
-                const tituloCell = row.cells[2];
-                
-                if (obraCell.querySelector('.search-highlight')) {
-                    obraCell.innerHTML = obraCell.textContent;
-                }
-                
-                if (codigoCell.querySelector('.search-highlight')) {
-                    codigoCell.innerHTML = codigoCell.textContent;
-                }
-                
-                if (tituloCell.querySelector('.search-highlight')) {
-                    tituloCell.innerHTML = tituloCell.textContent;
-                }
-            });
-        }
-        
-        // Función para ordenar registros
-        function sortRegistros(field) {
-            if (currentSort.field === field) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            if (editingTarjetaId) {
+                const index = tarjetasGuardadas.findIndex(t => t.id === editingTarjetaId);
+                if (index !== -1) tarjetasGuardadas[index] = tarjeta;
             } else {
-                currentSort.field = field;
-                currentSort.direction = 'asc';
+                tarjetasGuardadas.push(tarjeta);
+                consecutivoTarjeta++;
+                localStorage.setItem('consecutivoTarjeta', consecutivoTarjeta.toString());
             }
             
-            registros.sort((a, b) => {
-                let valA = a[currentSort.field];
-                let valB = b[currentSort.field];
-                
-                // Para campos de fecha
-                if (field === 'fecha') {
-                    valA = new Date(valA);
-                    valB = new Date(valB);
-                }
-                
-                // Para campos numéricos
-                if (field === 'revision' || field === 'totalCopias') {
-                    valA = Number(valA);
-                    valB = Number(valB);
-                }
-                
-                // Ordenamiento especial para obra: ordenar por obra y luego por código
-                if (field === 'obra') {
-                    if (a.obra === b.obra) {
-                        // Si la obra es la misma, ordenar por código
-                        valA = a.codigo;
-                        valB = b.codigo;
-                    } else {
-                        valA = a.obra;
-                        valB = b.obra;
-                    }
-                }
-                
-                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
-                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-            
-            actualizarTabla();
+            localStorage.setItem('tarjetasGuardadas', JSON.stringify(tarjetasGuardadas));
+            document.getElementById('numeroTarjeta').value = `CB-${consecutivoTarjeta.toString().padStart(4, '0')}`;
+            alert('Tarjeta guardada correctamente');
+            editingTarjetaId = null;
         }
         
-        // Función para actualizar la tabla con paginación
-        function actualizarTabla() {
-            tablaBody.innerHTML = '';
+        function nuevaTarjeta() {
+            if (confirm("¿Desea crear una nueva tarjeta? Se perderán los cambios no guardados.")) {
+                document.querySelector('.card-body form, .card-body').reset(); // Asumiendo que el form está dentro. Si no, resetear campos individualmente.
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('fechaEmision').value = today;
+                document.getElementById('fechaNecesidad').value = today;
+                document.getElementById('numeroTarjeta').value = `CB-${consecutivoTarjeta.toString().padStart(4, '0')}`;
+                items = [];
+                renderItems();
+                editingTarjetaId = null;
+                updatePreview();
+                alert('Formulario limpiado. Listo para una nueva tarjeta.');
+            }
+        }
+        
+        function buscarTarjetas() {
+            const obra = document.getElementById('searchObra').value.toLowerCase();
+            const plano = document.getElementById('searchPlano').value.toLowerCase();
+            const titulo = document.getElementById('searchTitulo').value.toLowerCase();
+            const fecha = document.getElementById('searchFecha').value;
             
-            if (registros.length === 0) {
-                document.getElementById('pagination-container').style.display = 'none';
-                emptyState.style.display = 'block';
+            const resultados = tarjetasGuardadas.filter(tarjeta => 
+                (!obra || (tarjeta.obra.codigo.toLowerCase().includes(obra) || (tarjeta.obra.descripcion && tarjeta.obra.descripcion.toLowerCase().includes(obra)))) &&
+                (!plano || (tarjeta.plano && tarjeta.plano.toLowerCase().includes(plano))) &&
+                (!titulo || tarjeta.titulo.toLowerCase().includes(titulo)) &&
+                (!fecha || tarjeta.fechaEmision === fecha)
+            );
+            
+            mostrarResultados(resultados);
+        }
+        
+        function mostrarResultados(resultados) {
+            const container = document.getElementById('searchResults');
+            if (resultados.length === 0) {
+                container.innerHTML = '<div class="no-tasks">No se encontraron tarjetas que coincidan con los criterios de búsqueda</div>';
                 return;
             }
             
-            emptyState.style.display = 'none';
-            document.getElementById('pagination-container').style.display = 'flex';
-            
-            // Calcular índices para la paginación
-            const startIndex = (currentPage - 1) * recordsPerPage;
-            const endIndex = Math.min(startIndex + recordsPerPage, registros.length);
-            
-            // Agregar registros a la tabla
-            for (let i = startIndex; i < endIndex; i++) {
-                agregarFilaTabla(registros[i], i);
-            }
-            
-            // Actualizar paginación
-            actualizarPaginacion();
-        }
-        
-        // Función para actualizar la paginación
-        function actualizarPaginacion() {
-            const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(registros.length / recordsPerPage);
-            
-            // Limpiar paginación
-            pagination.innerHTML = '';
-            
-            // Botón Anterior
-            const prevItem = document.createElement('li');
-            prevItem.className = 'page-item';
-            prevItem.id = 'prev-page';
-            if (currentPage === 1) {
-                prevItem.classList.add('disabled');
-            }
-            prevItem.innerHTML = '<a class="page-link" href="#" tabindex="-1">Anterior</a>';
-            prevItem.addEventListener('click', e => {
-                e.preventDefault();
-                if (currentPage > 1) {
-                    currentPage--;
-                    actualizarTabla();
-                }
+            container.innerHTML = '';
+            resultados.forEach(tarjeta => {
+                const fecha = new Date(tarjeta.fechaEmision + 'T00:00:00');
+                const fechaFormateada = fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.innerHTML = `
+                    <h3>${tarjeta.titulo} <small>(${tarjeta.numero})</small></h3>
+                    <div class="result-details">
+                        <div class="result-detail"><i class="fas fa-barcode"></i> Obra: ${tarjeta.obra.codigo}</div>
+                        <div class="result-detail"><i class="fas fa-drafting-compass"></i> Plano: ${tarjeta.plano || 'N/E'}</div>
+                        <div class="result-detail"><i class="fas fa-calendar-alt"></i> Fecha: ${fechaFormateada}</div>
+                        <div class="result-detail"><i class="fas fa-tasks"></i> Ítems: ${tarjeta.items.length}</div>
+                    </div>
+                    <div class="result-actions no-print">
+                        <button class="btn btn-edit" onclick="cargarTarjetaEnFormulario(${tarjeta.id})"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="btn btn-remove" onclick="eliminarTarjeta(${tarjeta.id})"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                    </div>
+                `;
+                container.appendChild(resultItem);
             });
-            pagination.appendChild(prevItem);
-            
-            // Números de página
-            const startPage = Math.max(1, currentPage - 2);
-            const endPage = Math.min(totalPages, startPage + 4);
-            
-            for (let i = startPage; i <= endPage; i++) {
-                const pageItem = document.createElement('li');
-                pageItem.className = 'page-item';
-                if (i === currentPage) {
-                    pageItem.classList.add('active');
-                }
-                pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-                pageItem.addEventListener('click', e => {
-                    e.preventDefault();
-                    currentPage = i;
-                    actualizarTabla();
-                });
-                pagination.appendChild(pageItem);
+        }
+        
+        function eliminarTarjeta(id) {
+            if (confirm("¿Está seguro que desea eliminar esta tarjeta? Esta acción no se puede deshacer.")) {
+                tarjetasGuardadas = tarjetasGuardadas.filter(t => t.id !== id);
+                localStorage.setItem('tarjetasGuardadas', JSON.stringify(tarjetasGuardadas));
+                buscarTarjetas();
+                alert("Tarjeta eliminada correctamente");
             }
+        }
+        
+        function cargarTarjetaEnFormulario(id) {
+            const tarjeta = tarjetasGuardadas.find(t => t.id === id);
+            if (!tarjeta) return;
             
-            // Botón Siguiente
-            const nextItem = document.createElement('li');
-            nextItem.className = 'page-item';
-            nextItem.id = 'next-page';
-            if (currentPage === totalPages) {
-                nextItem.classList.add('disabled');
-            }
-            nextItem.innerHTML = '<a class="page-link" href="#">Siguiente</a>';
-            nextItem.addEventListener('click', e => {
-                e.preventDefault();
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    actualizarTabla();
-                }
+            editingTarjetaId = tarjeta.id;
+            
+            document.getElementById('numeroTarjeta').value = tarjeta.numero;
+            document.getElementById('fechaEmision').value = tarjeta.fechaEmision;
+            document.getElementById('fechaNecesidad').value = tarjeta.fechaNecesidad;
+            document.getElementById('tituloTarjeta').value = tarjeta.titulo;
+            document.getElementById('numeroPlano').value = tarjeta.plano;
+            document.getElementById('obraCodigo').value = tarjeta.obra.codigo;
+            document.getElementById('obraDescripcion').value = tarjeta.obra.descripcion;
+            document.getElementById('planObras').value = tarjeta.obra.plan || '';
+            document.getElementById('inspeccionCalidad').value = tarjeta.inspeccion;
+            document.getElementById('medioSolicitud').value = tarjeta.medioSolicitud;
+            document.getElementById('sectorSolicitante').value = tarjeta.sectorSolicitante;
+            document.getElementById('solicitante').value = tarjeta.solicitante;
+            document.getElementById('zonaMontaje').value = tarjeta.zonaMontaje || '';
+            document.getElementById('horasEstimadas').value = tarjeta.horasEstimadas;
+            document.getElementById('materialVales').value = tarjeta.materialVales || '';
+            document.getElementById('responsableNombre').value = tarjeta.responsable.nombre;
+            document.getElementById('responsableCargo').value = tarjeta.responsable.cargo;
+            document.getElementById('contactoResponsable').value = tarjeta.responsable.contacto;
+            document.getElementById('listaDistribucion').value = tarjeta.listaDistribucion;
+            
+            items = [...tarjeta.items];
+            renderItems();
+            updatePreview();
+            
+            document.querySelector('.app-container').scrollIntoView({ behavior: 'smooth' });
+            alert(`Tarjeta ${tarjeta.numero} cargada para edición`);
+        }
+        
+        function exportarAPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            const margin = 15;
+            let y = margin;
+            
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text("TARJETA DE TRABAJO - COBRERÍA DE MONTAJE", 105, y, { align: 'center' });
+            y += 8;
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text("Documento técnico generado por el COP de Alistamiento Buques Mercantes", 105, y, { align: 'center' });
+            y += 15;
+            
+            const datos = [
+                ['Taller:', 'Cobrería', 'N° Tarjeta:', document.getElementById('prev-numero').textContent],
+                ['Fecha Emisión:', document.getElementById('prev-fecha').textContent, 'Fecha Necesidad:', document.getElementById('prev-fecha-necesidad').textContent],
+                ['Título:', document.getElementById('prev-titulo').textContent, 'N° Plano:', document.getElementById('prev-plano').textContent],
+                ['N° Obra:', document.getElementById('prev-obra').textContent, 'Plan de Obras:', document.getElementById('prev-plan-obra').textContent],
+                ['Medio Solicitud:', document.getElementById('prev-medio').textContent, 'Sector Solicitante:', document.getElementById('prev-sector').textContent],
+                ['Solicita:', document.getElementById('prev-solicitante').textContent, 'Zona de Montaje:', document.getElementById('prev-zona-montaje').textContent],
+                ['Horas Estimadas:', document.getElementById('prev-horas').textContent, 'Material en Vales:', document.getElementById('prev-material-vales').textContent],
+                ['N° Inspección Calidad:', document.getElementById('prev-inspeccion').textContent, '', ''],
+            ];
+            
+            doc.autoTable({
+                startY: y,
+                body: datos,
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 2 },
+                columnStyles: {
+                    0: { fontStyle: 'bold', cellWidth: 35 },
+                    1: { cellWidth: 55 },
+                    2: { fontStyle: 'bold', cellWidth: 35 },
+                    3: { cellWidth: 'auto' }
+                },
+                margin: { left: margin, right: margin }
             });
-            pagination.appendChild(nextItem);
-        }
-        
-        // Función para mostrar ayuda
-        function showHelp() {
-            alert("Sistema de Registro COP - Buques Mercantes\n\nInstrucciones:\n1. Complete el formulario con los datos del documento\n2. Especifique la cantidad de copias por taller\n3. Haga clic en 'Agregar Documento' para guardar\n4. Utilice los filtros para buscar documentos específicos\n5. Exporte los datos a Excel o PDF según sea necesario");
-        }
-        
-        // Función para mostrar acerca de
-        function showAbout() {
-            alert("Sistema de Registro COP - Buques Mercantes\n\nVersión: 2.0\nDesarrollado por: Departamento de Documentación Técnica\n© 2023 Todos los derechos reservados");
-        }
-        
-        // Eventos de búsqueda y filtrado
-        searchInput.addEventListener('input', filtrarRegistros);
-        obraFilter.addEventListener('input', filtrarRegistros);
-        
-        // Eventos de ordenamiento
-        document.querySelectorAll('th[data-sort]').forEach(th => {
-            th.addEventListener('click', () => {
-                sortRegistros(th.getAttribute('data-sort'));
+            
+            y = doc.lastAutoTable.finalY + 10;
+            
+            const headers = [['N°', 'N° de Tubería', 'Ubicación', 'DN', 'kg', 'Espesor', 'Burlonería', 'Juntas', 'Terminado']];
+            const body = items.map(item => [
+                item.number,
+                item.codigo,
+                item.descripcion,
+                item.dn,
+                item.peso,
+                item.espesor,
+                item.burloneria,
+                item.juntas,
+                item.terminado
+            ]);
+            
+            doc.autoTable({
+                startY: y,
+                head: headers,
+                body: body,
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [30, 58, 138], // --primary
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                margin: { left: margin, right: margin },
             });
-        });
-        
-        // Inicializar la aplicación
-        cargarRegistros();
+            
+            y = doc.lastAutoTable.finalY + 15;
+            
+            // ... (resto de la lógica de PDF que puede necesitar ajustes de posición)
+
+            const nombreArchivo = `tarjeta_${document.getElementById('numeroTarjeta').value}.pdf`;
+            doc.save(nombreArchivo);
+        }
     </script>
 </body>
 </html>
